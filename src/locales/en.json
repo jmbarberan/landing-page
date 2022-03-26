@@ -1,0 +1,12 @@
+{
+  "menu": {
+    "home": "Home",
+    "acerca": "About",
+    "demo": "Demo",
+    "planes": "Plans",
+    "contacto": "Contact us"
+  },
+  "vista": {
+    "welcome": "Welcome to ViniaPro"
+  }
+}
