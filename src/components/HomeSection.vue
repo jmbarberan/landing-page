@@ -5,7 +5,7 @@
         <v-col cols="10">
           <v-row align="center" justify="center">
             <v-col cols="12" md="6" xl="8">
-              <h1 class="display-2 font-weight-bold mb-4">Pointerp</h1>
+              <h1 class="display-2 font-weight-bold mb-4">ViniaPro</h1>
               <h1 class="font-weight-light">
                 Software de gestion de negocios <br />
                 Flexible, Rápido, fácil de operar <br />

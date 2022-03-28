@@ -15,8 +15,7 @@
       </v-card-text>
 
       <v-card-text class="white--text pt-0">
-        Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet.
-        Mauris cursus commodo interdum.
+        ViniaPro software de gestion administrativa.
       </v-card-text>
 
       <v-divider></v-divider>
@@ -40,19 +39,19 @@ export default {
     icons: [
       {
         text: "mdi-facebook",
-        link: "",
+        link: "https://www.facebook.com/martin.barberan/",
       },
       {
         text: "mdi-twitter",
-        link: "",
+        link: "https://twitter.com/MartinBarberan1",
       },
       {
         text: "mdi-linkedin",
-        link: "",
+        link: "https://www.linkedin.com/in/martin-barberan-07824151/",
       },
       {
         text: "mdi-instagram",
-        link: "https://instagram.com/joabson_arley/",
+        link: "https://www.instagram.com/martinbarberan/",
       },
     ],
   }),
