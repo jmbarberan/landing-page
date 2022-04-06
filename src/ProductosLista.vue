@@ -108,7 +108,7 @@
 </template>
 
 <script>
-const apiroot = process.env.RUTA_API
+const apiroot = process.env.VUE_APP_RUTA_API
 import foote from "./components/Footer";
 import { getProductos, setProductos } from "./utils/index"
 export default {
@@ -119,10 +119,10 @@ export default {
     procesando: false,
     busqueda: "",
     encabezados: [
-      { text: 'Codigo', value: 'Codigo', sortable: false },
-      { text: 'Nombre', value: 'Nombre' },
+      { text: 'Codigo', value: 'Codigo', sortable: true },
+      { text: 'Nombre', value: 'Nombre', sortable: true },
       { text: 'U.Medida', value: 'Medida', sortable: false },
-      { text: 'Grupo', value: 'Descripcion' },
+      { text: 'Grupo', value: 'Descripcion', sortable: true },
       { text: 'Costo', value: 'UltimoCosto', sortable: false, align: 'right' },
       { text: 'Existencias', value: 'Exitencia', align: 'right' },
       { text: 'Acciones', value: 'actions', sortable: false },

@@ -172,7 +172,7 @@
 </template>
 
 <script>
-const apiroot = "https://iceq-api.pointerp.pw/api/v4"
+const apiroot = process.env.VUE_APP_RUTA_API
 import foote from "./components/Footer";
 export default {
   components: {
