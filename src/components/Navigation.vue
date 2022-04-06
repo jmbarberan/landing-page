@@ -26,7 +26,7 @@
           v-for="([icon, text, link], i) in items"
           :key="i"
           link
-          @click="$vuetify.goTo(link)"
+          @click="navegar(link)"
         >
           <v-list-item-icon class="justify-center">
             <v-icon>{{ icon }}</v-icon>
@@ -70,8 +70,14 @@
         <v-btn text @click="$vuetify.goTo('#pricing')">
           <span class="mr-2">{{ $t("menu.planes") }}</span>
         </v-btn>
-        <v-btn rounded outlined text @click="$vuetify.goTo('#contact')">
+        <v-btn text @click="$vuetify.goTo('#contact')">
           <span class="mr-2">{{ $t("menu.contacto") }}</span>
+        </v-btn>
+        <!--v-btn rounded outlined text :href="appurl" target="_blank" color="primary">
+          <span class="mr-2">Acceder</span>
+        </v-btn-->
+        <v-btn rounded outlined text @click="irProductos()" color="primary">
+          <span class="mr-2">Acceder</span>
         </v-btn>
       </div>
     </v-app-bar>
@@ -95,6 +101,7 @@ export default {
     drawer: null,
     isXs: false,
     items: [],
+    appurl: "https://viniapro.com/productos"
   }),
   props: {
     color: String,
@@ -104,6 +111,16 @@ export default {
     onResize() {
       this.isXs = window.innerWidth < 850;
     },
+    navegar(destino) {
+      if (destino.startsWith("#")) {
+        this.$vuetify.goTo(destino)
+      } else {
+        window.open(destino, "_blank")
+      }
+    },
+    irProductos() {
+      this.$router.push({ name: "productos-lista" })
+    }
   },
 
   watch: {
@@ -122,6 +139,7 @@ export default {
       ["mdi-download-box-outline", this.$t("menu.demo"), "#download"],
       ["mdi-currency-usd", this.$t("menu.planes"), "#pricing"],
       ["mdi-email-outline", this.$t("menu.contacto"), "#contact"],
+      ["mdi-key", "Acceder", this.appurl],
     ]
   },
   mounted() {

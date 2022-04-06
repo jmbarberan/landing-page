@@ -15,7 +15,7 @@
       </v-card-text>
 
       <v-card-text class="white--text pt-0">
-        ViniaPro software de gestion administrativa.
+        Siga nuestras cuentas en las redes sociales para tutoriales, tips, y mucho mas.
       </v-card-text>
 
       <v-divider></v-divider>

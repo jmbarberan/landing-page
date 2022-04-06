@@ -1,6 +1,3 @@
-import { defaultDirection, defaultColor, 
-  themeSelectedColorStorageKey, themeRadiusStorageKey, 
-  localeOptions, defaultLocale } from '@/constants/config'
 
 export const mapOrder = (array, order, key) => {
   array.sort(function (a, b) {
@@ -56,89 +53,6 @@ export const ThemeColors = () => {
   }
 }
 
-export const getDirection = () => {
-  let direction = defaultDirection
-  if (localStorage.getItem('direction')) {
-    const localValue = localStorage.getItem('direction')
-    if (localValue === 'rtl' || localValue === 'ltr') {
-      direction = localValue
-    }
-  }
-  return {
-    direction,
-    isRtl: direction === 'rtl'
-  }
-}
-
-export const setDirection = localValue => {
-  let direction = 'ltr'
-  if (localValue === 'rtl' || localValue === 'ltr') {
-    direction = localValue
-  }
-  localStorage.setItem('direction', direction)
-}
-
-
-export const getThemeColor = () => {
-  let color = defaultColor;
-  try {
-    if (localStorage.getItem(themeSelectedColorStorageKey)) {
-      color = localStorage.getItem(themeSelectedColorStorageKey) || defaultColor;
-    }
-  } catch (error) {
-    console.log(">>>> src/utils/index.js : getThemeColor -> error", error)
-    color = defaultColor;
-  }
-  return color;
-}
-
-export const setThemeColor = (color) => {
-  try {
-    localStorage.setItem(themeSelectedColorStorageKey, color);
-  } catch (error) {
-    console.log(">>>> src/utils/index.js : setThemeColor -> error", error)
-  }
-}
-
-export const getThemeRadius = () => {
-  let radius = "rounded";
-  try {
-    if (localStorage.getItem(themeRadiusStorageKey)) {
-      radius = localStorage.getItem(themeRadiusStorageKey) || "rounded";
-    }
-  } catch (error) {
-    console.log(">>>> src/utils/index.js : getThemeRadius -> error", error)
-    radius = "rounded";
-  }
-  return radius;
-}
-
-export const setThemeRadius = (radius) => {
-  try {
-    localStorage.setItem(themeRadiusStorageKey, radius);
-  } catch (error) {
-    console.log(">>>> src/utils/index.js : setThemeRadius -> error", error)
-  }
-}
-
-export const getCurrentLanguage = () => {
-  let locale = defaultLocale;
-  try {
-    if (localStorage.getItem('currentLanguage') && localeOptions.filter(x => x.id === localStorage.getItem('currentLanguage')).length > 0) { locale = localStorage.getItem('currentLanguage'); }
-  } catch (error) {
-    console.log(">>>> src/utils/index.js : getCurrentLanguage -> error", error)
-    locale = defaultLocale;
-  }
-  return locale;
-}
-
-export const setCurrentLanguage = (lang) => {
-  try {
-    localStorage.setItem('currentLanguage', lang)
-  } catch (error) {
-    console.log(">>>> src/utils/index.js : setCurrentLanguage -> error", error)
-  }
-}
 
 export const getCurrentUser = () => {
   let user = null;
@@ -162,3 +76,24 @@ export const setCurrentUser = (user) => {
     console.log(">>>> src/utils/index.js : setCurrentUser -> error", error)
   }
 }
+
+export const getProductos = async ()=> {
+  try {
+    return Promise.resolve().then(function () {
+      return localStorage.getItem('productos');
+    });
+  } catch (error) {
+    console.log(">>>> src/utils/index.js : getProductos -> error", error)
+    return [];
+  }
+}
+
+export const setProductos = async (prds) => {
+  try {
+    return Promise.resolve().then(function () {
+      localStorage.setItem('productos', JSON.stringify(prds));
+    });
+  } catch (error) {
+    console.log(">>>> src/utils/index.js : setProductos -> error", error)
+  }
+} 

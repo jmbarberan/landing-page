@@ -13,8 +13,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "error" */ "./views/Error")
   },
   {
+    name: "productos-lista",
     path: "/productos",
-    component: () => import(/* webpackChunkName: "error" */ "./Productos.vue")
+    component: () => import(/* webpackChunkName: "prdLista" */ "./ProductosLista.vue")
+  },
+  {
+    name: "producto-editar",
+    path: "/productos/editor",
+    component: () => import(/* webpackChunkName: "prdEditor" */ "./Productos.vue")
   },
   {
     path: "*",

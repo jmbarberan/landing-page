@@ -68,6 +68,34 @@
                             <v-text-field
                                 type="number"
                                 class="entrada"
+                                v-model="producto.UltimoCosto"
+                                label="Costo"
+                                :readonly="procesando"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col class="col-xs-12" sm="12" md="3" lg="3">
+                            <v-text-field
+                                type="number"
+                                class="entrada"
+                                v-model="producto.Exitencia"
+                                label="Existencia"
+                                :readonly="procesando"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col class="col-xs-12" sm="12" md="3" lg="3">
+                            <v-checkbox
+                              class="entrada"
+                              v-model="producto.Iva"
+                              label="Grabado con iva"
+                              :readonly="procesando"
+                            ></v-checkbox>
+                          </v-col>
+                        </v-row>
+                        <v-row>
+                          <v-col class="col-xs-12" sm="12" md="3" lg="3">
+                            <v-text-field
+                                type="number"
+                                class="entrada"
                                 v-model="producto.Precio"
                                 label="Precio 1"
                                 :readonly="procesando"
@@ -82,14 +110,6 @@
                                 :readonly="procesando"
                             ></v-text-field>
                           </v-col>
-                          <v-col class="col-xs-12" sm="12" md="3" lg="3">
-                            <v-checkbox
-                              class="entrada"
-                              v-model="producto.Iva"
-                              label="Grabado con iva"
-                              :readonly="procesando"
-                            ></v-checkbox>
-                          </v-col>
                         </v-row>
                       </v-container>
                       
@@ -100,8 +120,21 @@
                           :dark="valid"
                           rounded
                           class="boton mt-3 mb-3 mr-3"
-                          @click="guardar"
-                        >Guardar</v-btn>
+                          @click="guardar(true)"
+                        >Guardar y salir</v-btn>
+                        <v-btn
+                          :disabled="!valid"
+                          color="primary"
+                          :dark="valid"
+                          rounded
+                          class="boton mt-3 mb-3 mr-3"
+                          @click="guardar(false)"
+                        >Guardar y nuevo</v-btn>
+                        <v-btn
+                          rounded
+                          class="boton mt-3 mb-3 mr-3"
+                          @click="salir()"
+                        >Salir</v-btn>
                       </div>
                     </v-form>
                   </v-col>
@@ -111,9 +144,6 @@
           </v-card-text>
         </v-card>
       </v-container>
-      <div class="svg-border-waves text-white">
-        <v-img src="~@/assets/img/borderWavesBlue.svg"/>
-      </div>
       <v-snackbar
         v-model="snackbar.enabled"
         timeout="3000"
@@ -140,6 +170,7 @@
     <foote />
   </div>
 </template>
+
 <script>
 const apiroot = "https://iceq-api.pointerp.pw/api/v4"
 import foote from "./components/Footer";
@@ -187,9 +218,16 @@ export default {
       Estado: 0,
       relPrecios: [],
       relImposiciones: [],
+      relPreciosEliminados: [],
       Iva: true,
-      Precio2: 0,
+      Precio2: 0
     },
+    original: {
+      precio1: 0,
+      precio2: 0,
+      precios: [],
+      imposiciones: []
+    }
   }),
 
   created() {
@@ -198,6 +236,51 @@ export default {
       this.color = "transparent";
       this.flat = true;
     }*/
+  },
+  mounted() {
+    if (this.$route.params.id > 0) {
+      let prd = this.$route.params.prd
+      this.producto = {
+        Id: prd.Id,
+        Codigo: prd.Codigo,
+        Nombre: prd.Nombre,
+        Barcode: prd.Barcode,
+        Grupo: prd.Grupo,
+        Descripcion: prd.Descripcion,
+        Medida: prd.Medida,
+        Tipo: prd.Tipo,
+        UltimoCosto: prd.UltimoCosto,
+        EmpresaId: prd.EmpresaId,
+        Exitencia: prd.Exitencia,
+        Adicional: prd.Adicional,
+        EmbalajeTipo: prd.EmbalajeTipo,
+        EmbalejeCantidad: prd.EmbalejeCantidad,
+        EmbalajeUnidad: prd.EmbalajeUnidad,
+        EmbalajeVolumen: prd.EmbalajeVolumen,
+        EspecieId: prd.EspecieId,
+        Marca: prd.Marca,
+        Precio: 0,
+        PrecioOrigen: prd.PrecioOrigen,
+        Estado: prd.Estado,
+        relPrecios: [],
+        relImposiciones: [],
+        relPreciosEliminados: [],
+        Iva: prd.relImposiciones.length > 0,
+        Precio2: 0
+      }
+      if (prd.relPrecios.length > 0) {
+        this.producto.Precio  = prd.relPrecios[0].Precio;
+        this.original.precio1 = prd.relPrecios[0].Precio;
+        if (prd.relPrecios.length > 1) {
+          this.producto.Precio2 = prd.relPrecios[1].Precio;
+          this.original.precio2 = prd.relPrecios[1].Precio;
+        }
+        this.original.precios = prd.relPrecios;
+      }
+      this.original.imposiciones = []
+      this.producto.relPrecios = []
+      this.producto.relImposiciones = []
+    }
   },
 
   /*watch: {
@@ -245,7 +328,7 @@ export default {
         EmbalajeTipo: 0,
         EmbalejeCantidad: 0,
         EmbalajeUnidad: 1,
-        EmbalajeVolumen: 0,
+        EmbalajeVolumen: "",
         EspecieId: 0,
         Marca: 0,
         Precio: 0,
@@ -253,48 +336,131 @@ export default {
         Estado: 0,
         relPrecios: [],
         relImposiciones: [],
+        relPreciosEliminados: [],
         Iva: true,
         Precio2: 0
       }
     },
-    guardar () {
+    guardar (salir) {
       this.toTop()
       this.procesando = true
-      let precios = []
-      if (this.producto.Precio != undefined) {
-        const precio = {
-          ProductoId: 0,
-          Precio: this.producto.Precio,
-          MinimoCondicion: 1,
-          VolumenCondicion: 1
+      if (this.original.precios.length <= 0) {
+        let precios = []
+        if (this.producto.Precio != undefined) {
+          const precio1 = {
+            Id: 0,
+            ProductoId: this.producto.Id,
+            Precio: this.producto.Precio,
+            MinimoCondicion: 1,
+            VolumenCondicion: 1
+          }
+          precios.push(precio1)
         }
-        precios.push(precio)
-      }
-      if (this.producto.Precio2 != undefined) {
-        const precio2 = {
-          ProductoId: 0,
-          Precio: this.producto.Precio2,
-          MinimoCondicion: 1,
-          VolumenCondicion: 1
+        if (this.producto.Precio2 != undefined) {
+          const precio2 = {
+            Id: 0,
+            ProductoId: this.producto.Id,
+            Precio: this.producto.Precio2,
+            MinimoCondicion: 1,
+            VolumenCondicion: 1
+          }
+          precios.push(precio2)
         }
-        precios.push(precio2)
+        this.producto.relPrecios = precios;
+      } else {
+        if (this.producto.Precio > 0) {
+          if (parseFloat(this.original.precio1) != parseFloat(this.producto.Precio)) {
+            this.producto.relPrecios.push({
+              Id: this.original.precios[0].Id,
+              ProductoId: this.original.precios[0].ProductoId,
+              Precio: this.producto.Precio,
+              MinimoCondicion: 1,
+              VolumenCondicion: 1
+            })
+          } else {
+            this.producto.relPrecios.push({
+              Id: this.original.precios[0].Id,
+              ProductoId: this.original.precios[0].ProductoId,
+              Precio: this.original.precios[0].Precio,
+              MinimoCondicion: 1,
+              VolumenCondicion: 1
+            })
+          }
+        } else {
+          if (this.original.precios.length > 0) {            
+            this.producto.relPreciosEliminados.push({
+              Id: this.original.precios[0].Id,
+              ProductoId: this.original.precios[0].ProductoId,
+              Precio: this.original.precios[0].Precio,
+              MinimoCondicion: 1,
+              VolumenCondicion: 1
+            })
+          }
+        }
+
+        if (this.original.precios.length > 1) {
+          if (this.producto.Precio2 > 0) {
+            if (parseFloat(this.original.precio2) != parseFloat(this.producto.Precio2)) {
+              this.producto.relPrecios.push({
+                Id: this.original.precios[1].Id,
+                ProductoId: this.original.precios[1].ProductoId,
+                Precio: this.producto.Precio2,
+                MinimoCondicion: 1,
+                VolumenCondicion: 1
+              })
+            } else {
+              this.producto.relPrecios.push({
+                Id: this.original.precios[1].Id,
+                ProductoId: this.original.precios[1].ProductoId,
+                Precio: this.original.precios[1].Precio,
+                MinimoCondicion: 1,
+                VolumenCondicion: 1
+              })
+            }
+          } else {
+            this.producto.relPrecios.push({
+              Id: this.original.precios[1].Id,
+              ProductoId: this.original.precios[1].ProductoId,
+              Precio: this.original.precios[1].Precio,
+              MinimoCondicion: 1,
+              VolumenCondicion: 1
+            })
+          }
+        } else {
+          // no habia precio 2 originalmente
+          if (this.producto.Precio2 > 0) {
+            this.producto.relPrecios.push({
+              Id: 0,
+              ProductoId: this.producto.Id,
+              Precio: this.producto.Precio2,
+              MinimoCondicion: 1,
+              VolumenCondicion: 1
+            })
+          }
+        }
       }
-      this.producto.relPrecios = precios;
       if (this.producto.Iva) {
-        const ivai = {
-          ProductoId: 0,
-          ImpuestoId: 1
+        if (this.original.imposiciones.length > 0) {
+          this.relImposiciones = this.original.imposiciones
+        } else {
+          this.producto.relImposiciones = [
+            {
+              ProductoId: 0,
+              ImpuestoId: 1
+            }
+          ]
         }
-        this.producto.relImposiciones = [
-          ivai
-        ]
       }
 
       this.guardarProducto(this.producto).then(resp => {
         if (resp.ok) {
-          this.mostrarAlerta("Producto guardado exitosamente")
-          this.reiniciar()
           this.procesando = false
+          this.mostrarAlerta("Producto guardado exitosamente")
+          if (salir) {
+            this.salir()
+          } else {
+            this.reiniciar()
+          }
         } else {
           console.log("Error al guardar")
           console.log(resp.text())
@@ -335,6 +501,11 @@ export default {
       this.snackbar.text = texto
       //this.snackbar.color = "green"
       this.snackbar.enabled = true
+    },
+    salir() {
+      this.$router.push({
+        name: "productos-lista"
+      })
     }
   },
 };
