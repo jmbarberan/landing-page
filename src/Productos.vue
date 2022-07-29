@@ -487,7 +487,10 @@ export default {
         return [];
       }
     },
-    async guardarProducto(p) {
+    async guardarProducto(p) { 
+      if (p.Nombre.startsWith("UNIO")) {
+        p.Nombre = p.Nombre.replace('UNIO', '@1_7');
+      }
       const response = await fetch(apiroot + "/inventarios/productos/guardar", {
         method: "POST",
         body: JSON.stringify(p),
@@ -495,7 +498,7 @@ export default {
           "Content-Type": "application/json"
         }
       })
-      return response
+      return response;
     },
     mostrarAlerta(texto) {
       this.snackbar.text = texto

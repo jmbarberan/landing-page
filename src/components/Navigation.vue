@@ -119,7 +119,8 @@ export default {
       }
     },
     irProductos() {
-      this.$router.push({ name: "productos-lista" })
+      //this.$router.push({ name: "productos-lista" })
+      window.location.href = "https://app.viniapro.com";
     }
   },
 

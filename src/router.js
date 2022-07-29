@@ -12,16 +12,16 @@ const routes = [
     path: "/error",
     component: () => import(/* webpackChunkName: "error" */ "./views/Error")
   },
-  {
-    name: "productos-lista",
-    path: "/productos",
-    component: () => import(/* webpackChunkName: "prdLista" */ "./ProductosLista.vue")
-  },
-  {
-    name: "producto-editar",
-    path: "/productos/editor",
-    component: () => import(/* webpackChunkName: "prdEditor" */ "./Productos.vue")
-  },
+  //{
+  //  name: "productos-lista",
+  //  path: "/productos",
+  //  component: () => import(/* webpackChunkName: "prdLista" */ "./ProductosLista.vue")
+  //},
+  //{
+  //  name: "producto-editar",
+  //  path: "/productos/editor",
+  //  component: () => import(/* webpackChunkName: "prdEditor" */ "./Productos.vue")
+  //},
   {
     path: "*",
     component: () => import(/* webpackChunkName: "error" */ "./views/Error")
