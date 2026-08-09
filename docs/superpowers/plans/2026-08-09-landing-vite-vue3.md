@@ -1072,17 +1072,21 @@ describe('HomeSection', () => {
     const wrapper = mountWithVuetify(HomeSection)
     const vm = wrapper.findComponent(HomeSection).vm
 
-    expect(wrapper.find('iframe').exists()).toBe(false)
+    expect(document.body.querySelector('iframe')).toBeNull()
 
     vm.dialog = true
     await vm.$nextTick()
 
-    expect(wrapper.find('iframe').exists()).toBe(true)
+    expect(document.body.querySelector('iframe')).not.toBeNull()
+
+    wrapper.unmount()
   })
 })
 ```
 
 El segundo test protege el cambio de `require()` a imports: si alguien lo revierte, el valor deja de ser una cadena resoluble. El tercero fija el `v-if` que evita que el vídeo cargue con el modal cerrado.
+
+**El tercer test busca en `document.body`, no en el wrapper, y esto no es negociable.** `v-dialog` teletransporta su contenido a `document.body`, así que `wrapper.find('iframe')` nunca lo encuentra. La tentación es añadir la prop `attach` al `v-dialog` para que se quede in situ — **no lo hagas**: `attach` desactiva el Teleport por completo, el overlay pasa a renderizarse dentro de `<section id="hero">`, que tiene `position: relative` y `z-index: 0`, y eso crea un contexto de apilamiento donde la barra superior fija puede acabar pintándose por encima del modal. Sería cambiar producción para acomodar un test que tenía solución sin tocarla. El `wrapper.unmount()` final evita que el contenido teletransportado contamine el test siguiente.
 
 - [ ] **Step 1: Sustituir los `require()` por imports estáticos**
 
@@ -1256,6 +1260,32 @@ El segundo test es el que importa: una ruta `~@/` sin corregir **no rompe el bui
 - `src/components/PricingSection.vue:16` — `<v-img src="~@/assets/img/paperplane.svg">` → `src="@/assets/img/paperplane.svg"`
 - `src/components/PricingSection.vue:50` — `airplane.svg`, mismo cambio
 - `src/components/PricingSection.vue:86` — `aeroplane.svg`, mismo cambio
+
+- [ ] **Step 1B: Sustituir `$vuetify.breakpoint` en `PricingSection.vue`**
+
+`PricingSection.vue` usa `this.$vuetify.breakpoint.smAndUp` (alrededor de las líneas 40, 42 y 76). **`$vuetify.breakpoint` no existe en Vuetify 3** — se sustituyó por el composable `useDisplay()`, y su ausencia lanza durante el render.
+
+Esto no es cosmético: es lo que ahora mismo mantiene la ruta `/` **completamente en blanco**. El error no se captura, así que Vue 3 aborta el montaje del árbol entero y no renderiza nada, ni siquiera las secciones ya migradas. Arreglar esto es lo que desbloquea la página.
+
+Añadir al componente:
+
+```js
+import { useDisplay } from 'vuetify'
+
+export default {
+  setup() {
+    const { smAndUp } = useDisplay()
+    return { smAndUp }
+  },
+  // ...resto de opciones
+}
+```
+
+Y sustituir cada `$vuetify.breakpoint.smAndUp` por `smAndUp` en plantilla, o `this.smAndUp` en el script. Revisar si hay otros usos de `$vuetify.breakpoint` en las tres secciones:
+
+```bash
+grep -rn "\$vuetify" src/components/AboutSection.vue src/components/DownloadSection.vue src/components/PricingSection.vue
+```
 
 - [ ] **Step 2: Revisar props de `v-btn` en las tres secciones**
 
