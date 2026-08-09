@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-/dist
+dist
 
 
 # local env files
@@ -22,3 +22,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Vite
+*.local
