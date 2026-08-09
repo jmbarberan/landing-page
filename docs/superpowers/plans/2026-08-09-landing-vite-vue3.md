@@ -580,14 +580,15 @@ export function mountWithVuetify(component, options = {}) {
 
   return mount(component, {
     global: {
+      ...globalOptions,
       plugins: [vuetify, i18n, ...(globalOptions.plugins ?? [])],
-      stubs: globalOptions.stubs,
-      mocks: globalOptions.mocks,
     },
     ...rest,
   })
 }
 ```
+
+El spread de `globalOptions` **antes** de sobrescribir `plugins` no es cosmético: enumerar los campos uno a uno (`stubs`, `mocks`, …) hace que cualquier otra clave de `global` — `provide`, `directives`, `components`, `config` — se pierda sin error ni aviso, y el componente monte sin lo que el test creía haberle dado. Eso produce falsos verdes en las cinco tasks que dependen de este helper.
 
 Se registran todos los componentes y directivas de Vuetify en los tests (a diferencia del build, que usa `autoImport` de `vite-plugin-vuetify`). Es lo más simple y el coste en tiempo de test es irrelevante a esta escala.
 
