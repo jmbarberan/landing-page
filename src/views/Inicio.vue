@@ -10,18 +10,13 @@
     </v-main>
     <v-scale-transition>
       <v-btn
-        fab
         v-show="fab"
-        v-scroll="onScroll"
-        dark
-        fixed
-        bottom
-        right
+        icon="mdi-arrow-up"
+        class="btn-to-top"
         color="secondary"
+        theme="dark"
         @click="toTop"
-      >
-        <v-icon>mdi-arrow-up</v-icon>
-      </v-btn>
+      />
     </v-scale-transition>
     <foote />
   </v-app>
@@ -29,21 +24,29 @@
 
 <style scoped>
 .v-main {
-  background-image: url("~@/assets/img/bgMain.png");
+  background-image: url("@/assets/img/bgMain.png");
   background-attachment: fixed;
   background-position: center;
   background-size: cover;
 }
+
+.btn-to-top {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 5;
+}
 </style>
 
 <script>
-import navigation from "../components/Navigation";
-import foote from "../components/Footer";
-import home from "../components/HomeSection";
-import about from "../components/AboutSection";
-import download from "../components/DownloadSection";
-import pricing from "../components/PricingSection";
-import contact from "../components/ContactSection";
+import { useGoTo } from "vuetify";
+import navigation from "../components/Navigation.vue";
+import foote from "../components/Footer.vue";
+import home from "../components/HomeSection.vue";
+import about from "../components/AboutSection.vue";
+import download from "../components/DownloadSection.vue";
+import pricing from "../components/PricingSection.vue";
+import contact from "../components/ContactSection.vue";
 
 export default {
   name: "App",
@@ -58,6 +61,10 @@ export default {
     contact,
   },
 
+  setup() {
+    return { goTo: useGoTo() };
+  },
+
   data: () => ({
     fab: null,
     color: "",
@@ -65,11 +72,20 @@ export default {
   }),
 
   created() {
-    const top = window.pageYOffset || 0;
+    const top = window.scrollY || 0;
     if (top <= 60) {
       this.color = "transparent";
       this.flat = true;
     }
+  },
+
+  mounted() {
+    window.addEventListener("scroll", this.onScroll, { passive: true });
+    this.onScroll();
+  },
+
+  unmounted() {
+    window.removeEventListener("scroll", this.onScroll);
   },
 
   watch: {
@@ -85,13 +101,12 @@ export default {
   },
 
   methods: {
-    onScroll(e) {
+    onScroll() {
       if (typeof window === "undefined") return;
-      const top = window.pageYOffset || e.target.scrollTop || 0;
-      this.fab = top > 60;
+      this.fab = window.scrollY > 60;
     },
     toTop() {
-      this.$vuetify.goTo(0);
+      this.goTo(0);
     },
   },
 };
