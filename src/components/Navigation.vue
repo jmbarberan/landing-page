@@ -120,7 +120,7 @@ export default {
     },
     /*irProductos() {
       //this.$router.push({ name: "productos-lista" })
-      window.location.href = "https://app.viniapro.com";
+      window.location.href = "https://app.viniagent.com";
     }*/
   },
 

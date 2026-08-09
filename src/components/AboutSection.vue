@@ -7,7 +7,7 @@
             <v-col cols="12" md="7">
               <h1 class="font-weight-light display-2">Acerca de</h1>
               <h1 class="font-weight-light display-1 mb-3">
-                ViniaPro
+                ViniaPro - Agent
               </h1>
               <v-row>
                 <v-col cols="12" class="d-flex align-center">
