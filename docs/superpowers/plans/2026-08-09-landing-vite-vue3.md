@@ -1611,15 +1611,16 @@ rm -rf node_modules
 pnpm install --frozen-lockfile
 ```
 
-pnpm avisará de los paquetes cuyos scripts de compilación ha bloqueado. Añadir a `package.json` **solo los que el build necesite de verdad** (esperables aquí: `esbuild`, `sass-embedded`, `vue-demi`; confirmar con la salida real):
+pnpm avisará de los paquetes cuyos scripts de compilación ha bloqueado.
 
-```json
-  "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sass-embedded", "vue-demi"]
-  }
+**Atención — el mecanismo cambió en pnpm 11.** El bloque `pnpm.onlyBuiltDependencies` de `package.json` ya no se lee; pnpm 11 lo retiró y la allowlist vive ahora en `pnpm-workspace.yaml` como un mapa `allowBuilds`. Esto se descubrió al ejecutar la Task 2 en este mismo entorno. Crear el archivo en la raíz del proyecto (sin clave `packages:`, para no convertirlo en un monorepo):
+
+```yaml
+allowBuilds:
+  esbuild: true
 ```
 
-Reinstalar tras el cambio.
+Añadir **solo los paquetes que pnpm haya reportado de verdad** como bloqueados. En el landing resultaron ser `@parcel/watcher` y `esbuild`; aquí es esperable que aparezcan otros (`sass-embedded`, `vue-demi`), pero **no los añadas sin que pnpm los nombre**. Reinstalar tras el cambio.
 
 - [ ] **Step 6: Verificar que el build sigue funcionando**
 
