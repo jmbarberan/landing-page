@@ -1,27 +1,22 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-
-Vue.use(VueRouter);
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: "/",
-    component: () => import(/* webpackChunkName: "home" */ "./views/Inicio.vue"),
+    path: '/',
+    component: () => import('./views/Inicio.vue'),
   },
   {
-    path: "/error",
-    component: () => import(/* webpackChunkName: "error" */ "./views/Error")
+    path: '/error',
+    component: () => import('./views/Error.vue'),
   },
   {
-    path: "*",
-    component: () => import(/* webpackChunkName: "error" */ "./views/Error")
-  }
-];
+    path: '/:pathMatch(.*)*',
+    component: () => import('./views/Error.vue'),
+  },
+]
 
-const router = new VueRouter({
-  linkActiveClass: "active",
+export default createRouter({
+  history: createWebHistory(),
+  linkActiveClass: 'active',
   routes,
-  mode: "history",
-});
-//router.beforeEach(AuthGuard);
-export default router;
+})
