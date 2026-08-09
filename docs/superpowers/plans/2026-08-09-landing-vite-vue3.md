@@ -33,6 +33,19 @@ El ciclo por componente es TDD real, y funciona precisamente porque es una migra
 
 Los tests cubren que el componente monta y renderiza su contenido clave. **No cubren la apariencia**, que es donde se concentra el riesgo de una migración de Vuetify 2 a 3. Por eso cada task mantiene además su verificación en el navegador, y ambas son obligatorias: un test verde no es evidencia de que la sección se vea bien, y una captura correcta no es evidencia de que no haya una regresión silenciosa.
 
+### Limitación de entorno vigente: sin capturas ni animaciones
+
+El Browser pane no está visible en la aplicación del usuario, así que la página **no compone frames**. Consecuencias confirmadas: las capturas de pantalla expiran a los 5 segundos, y `requestAnimationFrame` nunca dispara, lo que deja sin comprobar todo lo animado (`useGoTo`, transiciones de Vuetify).
+
+Decisión del usuario: **continuar con verificación de texto**, que sí funciona por completo — `read_page`, `read_console_messages`, `javascript_tool` para estilos calculados y estado del DOM, `read_network_requests`, y los tests de Vitest.
+
+Por tanto, en las tasks 4-8:
+- Los steps de "Captura" **se omiten**; anotar en el informe qué se habría capturado.
+- Lo que dependa de animación se comprueba por su efecto en el DOM (clases, estilos calculados), no por el movimiento.
+- Todo lo que quede sin verificar se anota como deuda para la Task 12.
+
+La Task 12 no puede ejecutarse hasta que el pane esté visible: es íntegramente revisión visual.
+
 ## Prerrequisito: Node 22.17.0 activo
 
 Vite 7 exige Node `^20.19.0 || >=22.12.0`. La máquina tiene nvm-windows con v22.17.0, v21.6.2 y v16.14.0 instaladas; **v21.6.2 no vale** (queda fuera de ambos rangos). El usuario debe activar la 22 desde una terminal elevada — `nvm use` cambia un symlink en `C:\Program Files\nodejs` y falla en silencio sin permisos de administrador:
@@ -574,11 +587,20 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import i18n from '@/plugins/i18n'
 
+import { h } from 'vue'
+
 export function mountWithVuetify(component, options = {}) {
   const vuetify = createVuetify({ components, directives })
-  const { global: globalOptions = {}, ...rest } = options
+  const { global: globalOptions = {}, props, slots, ...rest } = options
 
-  return mount(component, {
+  const Host = {
+    name: 'VuetifyLayoutHost',
+    render: () => h(components.VApp, null, {
+      default: () => [h(component, props, slots)],
+    }),
+  }
+
+  return mount(Host, {
     global: {
       ...globalOptions,
       plugins: [vuetify, i18n, ...(globalOptions.plugins ?? [])],
@@ -588,7 +610,13 @@ export function mountWithVuetify(component, options = {}) {
 }
 ```
 
-El spread de `globalOptions` **antes** de sobrescribir `plugins` no es cosmético: enumerar los campos uno a uno (`stubs`, `mocks`, …) hace que cualquier otra clave de `global` — `provide`, `directives`, `components`, `config` — se pierda sin error ni aviso, y el componente monte sin lo que el test creía haberle dado. Eso produce falsos verdes en las cinco tasks que dependen de este helper.
+Dos cosas que este helper resuelve y que conviene no deshacer:
+
+**El spread de `globalOptions` va antes de sobrescribir `plugins`.** Enumerar los campos uno a uno (`stubs`, `mocks`, …) hace que cualquier otra clave de `global` — `provide`, `directives`, `components`, `config` — se pierda sin error ni aviso, y el componente monte sin lo que el test creía haberle dado. Eso produce falsos verdes en las cinco tasks que dependen de este helper.
+
+**El componente se monta dentro de un `<v-app>` real.** `v-app-bar` y `v-navigation-drawer` hacen `inject` del contexto de layout y **lanzan al montar** si no encuentran un ancestro que lo provea. Es tentador inyectar un proveedor falso bajo `Symbol.for('vuetify:layout')`, pero eso se apoya en API interna no pública y devuelve posiciones y tamaños estáticos: cualquier aserción futura sobre posicionamiento entre barra, drawer y contenido pasaría siempre, detecte o no una regresión. Un `<v-app>` real ejercita el algoritmo genuino y es además lo que hace la aplicación en producción (`Inicio.vue` ya envuelve todo en `<v-app>`).
+
+**Consecuencia para los tests:** `mount` devuelve el wrapper del *host*, no el del componente. Los métodos de DOM (`text()`, `html()`, `find()`, `findAll()`, `unmount()`) funcionan igual, pero para llegar a la instancia hay que usar `wrapper.findComponent(Componente).vm`, no `wrapper.vm`. Los specs de las tasks 4-8 ya están escritos así.
 
 Se registran todos los componentes y directivas de Vuetify en los tests (a diferencia del build, que usa `autoImport` de `vite-plugin-vuetify`). Es lo más simple y el coste en tiempo de test es irrelevante a esta escala.
 
@@ -611,7 +639,7 @@ describe('App', () => {
       },
     })
 
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.findComponent(App).exists()).toBe(true)
   })
 })
 ```
@@ -674,8 +702,9 @@ describe('Navigation', () => {
       props: { color: 'transparent', flat: true },
     })
 
-    expect(wrapper.vm.items).toHaveLength(6)
-    expect(wrapper.vm.items[0][2]).toBe('#hero')
+    const vm = wrapper.findComponent(Navigation).vm
+    expect(vm.items).toHaveLength(6)
+    expect(vm.items[0][2]).toBe('#hero')
   })
 })
 ```
@@ -846,20 +875,21 @@ describe('Inicio', () => {
     const addSpy = vi.spyOn(window, 'addEventListener')
     const wrapper = mountWithVuetify(Inicio, { global: { stubs } })
 
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.findComponent(Inicio).exists()).toBe(true)
     expect(addSpy).toHaveBeenCalledWith('scroll', expect.any(Function), { passive: true })
   })
 
   it('muestra el boton flotante solo al bajar de 60px', async () => {
     const wrapper = mountWithVuetify(Inicio, { global: { stubs } })
+    const vm = wrapper.findComponent(Inicio).vm
 
-    expect(wrapper.vm.fab).toBe(false)
+    expect(vm.fab).toBe(false)
 
     window.scrollY = 200
-    wrapper.vm.onScroll()
-    await wrapper.vm.$nextTick()
+    vm.onScroll()
+    await vm.$nextTick()
 
-    expect(wrapper.vm.fab).toBe(true)
+    expect(vm.fab).toBe(true)
   })
 
   it('retira el listener al desmontar', () => {
@@ -1032,7 +1062,7 @@ describe('HomeSection', () => {
   it('resuelve las imagenes de los iconos a rutas de assets, no a require', () => {
     const wrapper = mountWithVuetify(HomeSection)
 
-    for (const feature of wrapper.vm.features) {
+    for (const feature of wrapper.findComponent(HomeSection).vm.features) {
       expect(typeof feature.img).toBe('string')
       expect(feature.img.length).toBeGreaterThan(0)
     }
@@ -1040,11 +1070,12 @@ describe('HomeSection', () => {
 
   it('no carga el iframe del video mientras el modal esta cerrado', async () => {
     const wrapper = mountWithVuetify(HomeSection)
+    const vm = wrapper.findComponent(HomeSection).vm
 
     expect(wrapper.find('iframe').exists()).toBe(false)
 
-    wrapper.vm.dialog = true
-    await wrapper.vm.$nextTick()
+    vm.dialog = true
+    await vm.$nextTick()
 
     expect(wrapper.find('iframe').exists()).toBe(true)
   })
@@ -1207,7 +1238,7 @@ describe.each([
 ])('%s', (nombre, componente) => {
   it('monta sin errores', () => {
     const wrapper = mountWithVuetify(componente)
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.findComponent(componente).exists()).toBe(true)
   })
 
   it('no deja rutas de assets con el prefijo ~ de webpack', () => {
@@ -1320,7 +1351,7 @@ describe('Footer', () => {
 describe('Error', () => {
   it('monta sin errores', () => {
     const wrapper = mountWithVuetify(ErrorView)
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.findComponent(ErrorView).exists()).toBe(true)
   })
 })
 ```
