@@ -74,11 +74,8 @@
           <span class="mr-2">{{ $t("menu.contacto") }}</span>
         </v-btn>
         <v-btn rounded outlined text :href="appurl" target="_blank" color="primary">
-          <span class="mr-2">Acceder</span>
+          <span class="mr-2">Ingresar</span>
         </v-btn>
-        <!--v-btn rounded outlined text @click="irProductos()" color="primary">
-          <span class="mr-2">Acceder</span>
-        </v-btn-->
       </div>
     </v-app-bar>
   </div>

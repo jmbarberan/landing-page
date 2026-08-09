@@ -14,7 +14,9 @@
 
 - Directorio del landing: `C:\Desarrollo\Repositorios\viniapro\viniapro-landing`. Repo git propio, remoto `origin` → `https://github.com/jmbarberan/landing-page.git`, rama actual la que esté activa.
 - Directorio del ERP (solo Task 11): `C:\Desarrollo\Repositorios\viniapro\viniapro-erp`. Repo git distinto, remoto `github-viniapro`.
-- Node 20 en local y en Docker. Ambos `Dockerfile` usan `docker.io/library/node:20-alpine` y no se cambia esa base.
+- Node 22.17.0 en local (vía nvm), Node 20 en Docker. Ambos `Dockerfile` usan `docker.io/library/node:20-alpine` y no se cambia esa base.
+- Rama de trabajo: se commitea directamente en `master` (landing) y `main` (ERP). El usuario dio su consentimiento explícito; no crear ramas.
+- Todo componente migrado lleva su test de montaje en `tests/`, escrito **antes** de migrarlo y verificado en rojo primero. Los tests se montan siempre con `mountWithVuetify` de `tests/helpers.js`.
 - Gestor de paquetes: pnpm 11.2.2, fijado en el campo `packageManager` de cada `package.json`.
 - Ningún `npm install` ni `npm ci` tras la Task 2. En Docker siempre `pnpm install --frozen-lockfile`.
 - El alias `@` apunta a `<proyecto>/src` y debe funcionar en JS, en plantillas y en `url()` de CSS.
@@ -25,20 +27,30 @@
 
 ## Nota sobre verificación
 
-**Este proyecto no tiene framework de pruebas y este plan no lo añade.** Es un landing estático sin lógica de negocio: el valor de unos tests unitarios sobre plantillas Vuetify no compensa su coste, y añadir Vitest sería alcance que nadie pidió. Es una desviación deliberada del ciclo TDD habitual.
+El proyecto no tenía framework de pruebas. **Este plan añade Vitest** (Task 3B) y cada componente migrado lleva su test de montaje.
 
-En su lugar, **cada task termina con una verificación ejecutable concreta** — build que compila, lint limpio, o una comprobación en el navegador con las herramientas del Browser pane — y un commit. Ninguna task se da por terminada sin que su comprobación pase. Las comprobaciones de navegador son obligatorias, no opcionales: "compila" no es evidencia de que la sección se vea bien.
+El ciclo por componente es TDD real, y funciona precisamente porque es una migración: el test se escribe primero contra `@vue/test-utils` de Vue 3, y **falla mientras el componente siga siendo Vue 2** porque no monta. Migrar el componente es lo que lo pone en verde. El orden en las tasks 4-8 es siempre: escribir el test → verlo fallar → migrar → verlo pasar.
 
-## Prerrequisito: Node 20 en local
+Los tests cubren que el componente monta y renderiza su contenido clave. **No cubren la apariencia**, que es donde se concentra el riesgo de una migración de Vuetify 2 a 3. Por eso cada task mantiene además su verificación en el navegador, y ambas son obligatorias: un test verde no es evidencia de que la sección se vea bien, y una captura correcta no es evidencia de que no haya una regresión silenciosa.
 
-El shell de desarrollo tiene **Node v16.14.0**, que no sirve: Vite 7 exige Node ≥20 y pnpm 11 también. Antes de empezar, instalar Node 20 (por ejemplo con `nvm-windows`) y confirmar:
+## Prerrequisito: Node 22.17.0 activo
+
+Vite 7 exige Node `^20.19.0 || >=22.12.0`. La máquina tiene nvm-windows con v22.17.0, v21.6.2 y v16.14.0 instaladas; **v21.6.2 no vale** (queda fuera de ambos rangos). El usuario debe activar la 22 desde una terminal elevada — `nvm use` cambia un symlink en `C:\Program Files\nodejs` y falla en silencio sin permisos de administrador:
 
 ```bash
-node -v    # debe imprimir v20.x
+nvm use 22.17.0
+```
+
+Confirmar antes de la Task 2:
+
+```bash
+node -v    # debe imprimir v22.17.0
 pnpm -v    # debe imprimir 11.2.2
 ```
 
-Si `node -v` sigue mostrando v16, **detenerse y avisar**. Todo el plan a partir de la Task 2 falla de formas confusas con Node 16.
+Si `node -v` muestra v21 o v16, **detenerse y avisar**. Todo el plan a partir de la Task 2 falla de formas confusas.
+
+Nota: en local se desarrolla con Node 22 y los Dockerfile despliegan con Node 20. Es una diferencia asumida conscientemente por el usuario.
 
 ## Estructura de archivos
 
@@ -51,6 +63,9 @@ Si `node -v` sigue mostrando v16, **detenerse y avisar**. Todo el plan a partir 
 | `eslint.config.js` | Flat config de eslint 9 |
 | `.dockerignore` | Excluir `node_modules`, `dist`, `.git`, `.vscode`, `.env` del contexto de build |
 | `pnpm-lock.yaml` | Generado por `pnpm install` |
+| `tests/setup.js` | Stubs de APIs de navegador que jsdom no trae y Vuetify exige |
+| `tests/helpers.js` | `mountWithVuetify`, el único montador que usan los tests |
+| `tests/*.spec.js` | Un archivo por task de componente (tasks 3B-8) |
 
 **Se modifican:** `package.json`, `.env`, `.gitignore`, `Dockerfile`, `src/main.js`, `src/router.js`, `src/App.vue`, `src/plugins/vuetify.js`, `src/plugins/i18n.js`, `src/views/Inicio.vue`, `src/views/Error.vue`, y los siete componentes de `src/components/`.
 
@@ -83,10 +98,12 @@ Espera: `src/components/Navigation.vue` aparece modificado (cambio preexistente 
 - [ ] **Step 2: Verificar que el build actual funciona**
 
 ```bash
-npm --prefix C:/Desarrollo/Repositorios/viniapro/viniapro-landing run build
+NODE_OPTIONS=--openssl-legacy-provider npm --prefix C:/Desarrollo/Repositorios/viniapro/viniapro-landing run build
 ```
 
 Espera: termina sin error y genera `dist/`. Este es el estado de referencia. Si ya falla aquí, detenerse: el problema es previo y hay que diagnosticarlo antes de borrar nada.
+
+`NODE_OPTIONS=--openssl-legacy-provider` es obligatorio: webpack 4 usa una API de crypto que Node retiró a partir de la 17, y el entorno corre Node ≥21. Es el mismo flag que lleva hoy el `Dockerfile`, y desaparece con él en la Task 10. **Esta task es la única que lo necesita**; a partir de la Task 2 el build es Vite y no lo lleva.
 
 - [ ] **Step 3: Borrar los dos componentes**
 
@@ -142,7 +159,7 @@ Espera: sin resultados. Si aparece alguno, resolverlo antes de seguir.
 - [ ] **Step 9: Verificar que el build sigue funcionando**
 
 ```bash
-npm --prefix C:/Desarrollo/Repositorios/viniapro/viniapro-landing run build
+NODE_OPTIONS=--openssl-legacy-provider npm --prefix C:/Desarrollo/Repositorios/viniapro/viniapro-landing run build
 ```
 
 Espera: termina sin error, igual que en el Step 2.
@@ -185,6 +202,8 @@ Al terminar esta task el proyecto **no arranca todavía**: el código fuente sig
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --fix"
   },
   "dependencies": {
@@ -198,11 +217,14 @@ Al terminar esta task el proyecto **no arranca todavía**: el código fuente sig
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "^9.17.0",
     "eslint-plugin-vue": "^9.32.0",
+    "jsdom": "^25.0.1",
     "sass": "^1.83.0",
     "vite": "^7.0.0",
-    "vite-plugin-vuetify": "^2.0.4"
+    "vite-plugin-vuetify": "^2.0.4",
+    "vitest": "^2.1.8"
   },
   "browserslist": [
     "> 1%",
@@ -243,8 +265,20 @@ export default defineConfig({
   server: {
     port: 8080,
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./tests/setup.js'],
+    server: {
+      deps: {
+        inline: ['vuetify'],
+      },
+    },
+  },
 })
 ```
+
+El bloque `test` lo consume Vitest (comparte configuración con Vite, no necesita archivo aparte). `deps.inline: ['vuetify']` es imprescindible: Vuetify se distribuye sin transpilar y sin esto los tests fallan al importarlo.
 
 `transformAssetUrls` es lo que hace que Vite reescriba las rutas de assets en props de componentes Vuetify (`v-img src`, `v-parallax src`, `v-navigation-drawer image`). Sin él, esas imágenes se sirven rotas en producción aunque el build compile.
 
@@ -490,6 +524,117 @@ git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra el 
 
 ---
 
+### Task 3B: Infraestructura de pruebas con Vitest
+
+Habilita el ciclo TDD de las tasks 4-8. Entregable: `pnpm test` ejecuta y pasa con un test que monta la aplicación.
+
+**Files:**
+- Create: `tests/setup.js`, `tests/helpers.js`, `tests/app.spec.js`
+
+**Interfaces:**
+- Consumes: el bloque `test` de `vite.config.js` (Task 2), los plugins `vuetify` e `i18n` (Task 3)
+- Produces: `mountWithVuetify(component, options)` exportado desde `tests/helpers.js`. **Todas las tasks 4-8 montan sus componentes con esta función**, nunca con `mount` de `@vue/test-utils` directamente — sin la instancia de Vuetify, cualquier componente que use `v-*` lanza al montar.
+
+- [ ] **Step 1: Crear `tests/setup.js`**
+
+Vuetify 3 usa APIs de navegador que jsdom no implementa. Sin estos stubs, cualquier test que monte un componente Vuetify falla con `ResizeObserver is not defined`:
+
+```js
+import { vi } from 'vitest'
+
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+global.visualViewport = {
+  addEventListener() {},
+  removeEventListener() {},
+}
+
+window.matchMedia = window.matchMedia || vi.fn().mockImplementation((query) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener() {},
+  removeListener() {},
+  addEventListener() {},
+  removeEventListener() {},
+  dispatchEvent() {},
+}))
+```
+
+- [ ] **Step 2: Crear `tests/helpers.js`**
+
+```js
+import { mount } from '@vue/test-utils'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import i18n from '@/plugins/i18n'
+
+export function mountWithVuetify(component, options = {}) {
+  const vuetify = createVuetify({ components, directives })
+  const { global: globalOptions = {}, ...rest } = options
+
+  return mount(component, {
+    global: {
+      plugins: [vuetify, i18n, ...(globalOptions.plugins ?? [])],
+      stubs: globalOptions.stubs,
+      mocks: globalOptions.mocks,
+    },
+    ...rest,
+  })
+}
+```
+
+Se registran todos los componentes y directivas de Vuetify en los tests (a diferencia del build, que usa `autoImport` de `vite-plugin-vuetify`). Es lo más simple y el coste en tiempo de test es irrelevante a esta escala.
+
+- [ ] **Step 3: Escribir el test de humo**
+
+`tests/app.spec.js`:
+
+```js
+import { describe, it, expect } from 'vitest'
+import App from '@/App.vue'
+import { mountWithVuetify } from './helpers'
+
+describe('App', () => {
+  it('monta sin errores', () => {
+    const wrapper = mountWithVuetify(App, {
+      global: {
+        stubs: {
+          RouterView: true,
+        },
+      },
+    })
+
+    expect(wrapper.exists()).toBe(true)
+  })
+})
+```
+
+`RouterView` se sustituye por un stub para que el test no arrastre el router ni los componentes de sección, que todavía no están migrados.
+
+- [ ] **Step 4: Ejecutar los tests**
+
+```bash
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test
+```
+
+Espera: 1 test, PASS. Si falla con `ResizeObserver is not defined`, el `setupFiles` de `vite.config.js` no se está cargando. Si falla al importar `vuetify`, falta el `deps.inline`.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add -A
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Anade Vitest y la infraestructura de pruebas de componentes"
+```
+
+---
+
 ### Task 4: Migrar `Navigation.vue`
 
 El componente con más cambios de API del proyecto: barra superior, drawer móvil y navegación por anclas.
@@ -498,10 +643,52 @@ El componente con más cambios de API del proyecto: barra superior, drawer móvi
 - Modify: `src/components/Navigation.vue`
 
 **Interfaces:**
-- Consumes: `useGoTo` de `vuetify`, `$t()` del i18n de la Task 3
+- Consumes: `useGoTo` de `vuetify`, `$t()` del i18n de la Task 3, `mountWithVuetify` de `tests/helpers.js` (Task 3B)
 - Produces: componente `Navigation` con props `color: String` y `flat: Boolean`, consumido por `Inicio.vue` en la Task 5. Las props no cambian de nombre ni de tipo.
 
-- [ ] **Step 1: Sustituir `$vuetify.goTo` por el composable `useGoTo`**
+- [ ] **Step 1: Escribir el test que falla**
+
+`tests/navigation.spec.js`:
+
+```js
+import { describe, it, expect } from 'vitest'
+import Navigation from '@/components/Navigation.vue'
+import { mountWithVuetify } from './helpers'
+
+describe('Navigation', () => {
+  it('renderiza las etiquetas del menu traducidas', () => {
+    const wrapper = mountWithVuetify(Navigation, {
+      props: { color: 'transparent', flat: true },
+    })
+
+    const texto = wrapper.text()
+    expect(texto).toContain('Inicio')
+    expect(texto).toContain('Acerca')
+    expect(texto).toContain('Planes')
+    expect(texto).toContain('Ingresar')
+  })
+
+  it('construye las seis entradas del drawer', () => {
+    const wrapper = mountWithVuetify(Navigation, {
+      props: { color: 'transparent', flat: true },
+    })
+
+    expect(wrapper.vm.items).toHaveLength(6)
+    expect(wrapper.vm.items[0][2]).toBe('#hero')
+  })
+})
+```
+
+- [ ] **Step 2: Ejecutar el test y verlo fallar**
+
+```bash
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test navigation
+```
+
+Espera: FALLA. El componente todavía usa la API de Vue 2 (`data: () => ({...})` con `$vuetify.goTo`) y componentes retirados de Vuetify 2, así que no monta. **Si pasara, detenerse**: significaría que el test no está ejercitando lo que se cree.
+
+- [ ] **Step 3: Sustituir `$vuetify.goTo` por el composable `useGoTo`**
 
 `$vuetify.goTo()` no existe en Vuetify 3. Añadir un `setup()` al componente y usar `this.goTo(...)` en su lugar:
 
@@ -518,7 +705,7 @@ export default {
 
 En el método `navegar`, reemplazar `this.$vuetify.goTo(destino)` por `this.goTo(destino)`. En la plantilla, los seis `@click="$vuetify.goTo('#...')"` pasan a `@click="goTo('#...')"`.
 
-- [ ] **Step 2: Migrar el `v-navigation-drawer`**
+- [ ] **Step 4: Migrar el `v-navigation-drawer`**
 
 ```vue
 <v-navigation-drawer
@@ -531,7 +718,7 @@ En el método `navegar`, reemplazar `this.$vuetify.goTo(destino)` por `this.goTo
 
 Cambios: la prop `app` desaparece (el layout lo resuelve `v-app`); `dark` pasa a `theme="dark"`; `src` pasa a `image`. La ruta `@/assets/...` funciona gracias a `transformAssetUrls` de la Task 2.
 
-- [ ] **Step 3: Migrar el primer `v-list-item` (cabecera del drawer)**
+- [ ] **Step 5: Migrar el primer `v-list-item` (cabecera del drawer)**
 
 `v-list-item-avatar` y `v-list-item-content` no existen en Vuetify 3. La cabecera pasa a usar props y el slot `prepend`:
 
@@ -547,7 +734,7 @@ Cambios: la prop `app` desaparece (el layout lo resuelve `v-app`); `dark` pasa a
 </v-list>
 ```
 
-- [ ] **Step 4: Migrar la lista de navegación**
+- [ ] **Step 6: Migrar la lista de navegación**
 
 `v-list-item-icon` desaparece; el icono va en el slot `prepend` y el texto en la prop `title`:
 
@@ -569,7 +756,7 @@ Cambios: la prop `app` desaparece (el layout lo resuelve `v-app`); `dark` pasa a
 
 `dense` pasa a `density="compact"`.
 
-- [ ] **Step 5: Migrar el `v-app-bar`**
+- [ ] **Step 7: Migrar el `v-app-bar`**
 
 ```vue
 <v-app-bar
@@ -583,7 +770,7 @@ Cambios: la prop `app` desaparece (el layout lo resuelve `v-app`); `dark` pasa a
 
 `app` desaparece, `dark` pasa a `theme="dark"`.
 
-- [ ] **Step 6: Migrar los botones**
+- [ ] **Step 8: Migrar los botones**
 
 Los seis `v-btn text` pasan a `v-btn variant="text"`. El botón "Ingresar", que hoy combina `rounded outlined text`, pasa a:
 
@@ -595,24 +782,33 @@ Los seis `v-btn text` pasan a `v-btn variant="text"`. El botón "Ingresar", que 
 
 `variant` es excluyente: no pueden convivir `outlined` y `text`; se elige `outlined`, que es el aspecto dominante hoy.
 
-- [ ] **Step 7: Verificar en el navegador — escritorio**
+- [ ] **Step 9: Ejecutar el test y verlo pasar**
+
+```bash
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test navigation
+```
+
+Espera: PASA, los dos tests. Si sigue fallando, la migración está incompleta: leer el error antes de tocar el test. **No relajar las aserciones para que pase.**
+
+- [ ] **Step 10: Verificar en el navegador — escritorio**
 
 Con `resize_window` a 1280x800 y recargando, comprobar con `read_page` que los seis botones del menú están presentes con sus etiquetas traducidas (Inicio, Acerca, Demostración, Planes, Contactenos, Ingresar). Con `read_console_messages`, cero errores.
 
 Hacer clic en "Planes" con `computer` y confirmar por `javascript_tool` que `window.scrollY` cambió: eso valida que `useGoTo` funciona.
 
-- [ ] **Step 8: Verificar en el navegador — móvil**
+- [ ] **Step 11: Verificar en el navegador — móvil**
 
 Con `resize_window` al preset `mobile` (375px) y recargando, comprobar que aparece el icono de hamburguesa en lugar de los botones. Hacer clic y confirmar con `read_page` que el drawer se abre con las seis entradas y sus iconos.
 
-- [ ] **Step 9: Captura**
+- [ ] **Step 12: Captura**
 
 `computer {action: "screenshot"}` en móvil con el drawer abierto, y en escritorio. Se guardan para la revisión de la Task 12.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 13: Commit**
 
 ```bash
-git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/Navigation.vue
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/Navigation.vue tests/navigation.spec.js
 git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra Navigation a la API de Vuetify 3"
 ```
 
@@ -624,8 +820,59 @@ git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra Nav
 - Modify: `src/views/Inicio.vue`
 
 **Interfaces:**
-- Consumes: `Navigation` de la Task 4 (props `color`, `flat`)
+- Consumes: `Navigation` de la Task 4 (props `color`, `flat`), `mountWithVuetify` de `tests/helpers.js`
 - Produces: el contenedor `v-app` que envuelve todas las secciones. Las tasks 6-8 migran componentes que se renderizan dentro de su `v-main`.
+
+**Ciclo TDD — leer antes de empezar.** Escribe primero `tests/inicio.spec.js` con el código de abajo, ejecútalo con `pnpm test inicio` y **compruébalo en rojo**. Los steps numerados lo ponen en verde. El último step antes del commit vuelve a ejecutarlo esperando verde. No relajes las aserciones para que pase.
+
+```js
+import { describe, it, expect, vi } from 'vitest'
+import Inicio from '@/views/Inicio.vue'
+import { mountWithVuetify } from './helpers'
+
+const stubs = {
+  navigation: true,
+  foote: true,
+  home: true,
+  about: true,
+  download: true,
+  pricing: true,
+  contact: true,
+}
+
+describe('Inicio', () => {
+  it('monta y registra el listener de scroll', () => {
+    const addSpy = vi.spyOn(window, 'addEventListener')
+    const wrapper = mountWithVuetify(Inicio, { global: { stubs } })
+
+    expect(wrapper.exists()).toBe(true)
+    expect(addSpy).toHaveBeenCalledWith('scroll', expect.any(Function), { passive: true })
+  })
+
+  it('muestra el boton flotante solo al bajar de 60px', async () => {
+    const wrapper = mountWithVuetify(Inicio, { global: { stubs } })
+
+    expect(wrapper.vm.fab).toBe(false)
+
+    window.scrollY = 200
+    wrapper.vm.onScroll()
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.fab).toBe(true)
+  })
+
+  it('retira el listener al desmontar', () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener')
+    const wrapper = mountWithVuetify(Inicio, { global: { stubs } })
+
+    wrapper.unmount()
+
+    expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function))
+  })
+})
+```
+
+El tercer test es el que justifica el ciclo: la directiva `v-scroll` de Vuetify 2 limpiaba su listener sola, y al sustituirla por uno manual es fácil olvidar el `unmounted`. Ese olvido es una fuga de memoria que ninguna captura de pantalla detecta.
 
 - [ ] **Step 1: Añadir la extensión `.vue` a todos los imports**
 
@@ -735,10 +982,19 @@ getComputedStyle(document.querySelector('.v-main')).backgroundImage
 
 Espera: una `url(...)` que apunta a un asset servido, **no** `none` ni una ruta con `~`.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Ejecutar los tests y verlos pasar**
 
 ```bash
-git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/views/Inicio.vue
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test inicio
+```
+
+Espera: PASA, los tres tests.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/views/Inicio.vue tests/inicio.spec.js
 git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra Inicio a Vuetify 3 y sustituye la directiva v-scroll"
 ```
 
@@ -752,8 +1008,49 @@ La sección con más superficie de cambio: parallax, tarjetas con hover, imágen
 - Modify: `src/components/HomeSection.vue`
 
 **Interfaces:**
-- Consumes: `useGoTo` de `vuetify`
+- Consumes: `useGoTo` de `vuetify`, `mountWithVuetify` de `tests/helpers.js`
 - Produces: nada que consuman otras tasks
+
+**Ciclo TDD — leer antes de empezar.** Escribe primero `tests/home-section.spec.js`, ejecútalo con `pnpm test home-section` y **compruébalo en rojo**. Los steps numerados lo ponen en verde. El penúltimo step vuelve a ejecutarlo esperando verde.
+
+```js
+import { describe, it, expect } from 'vitest'
+import HomeSection from '@/components/HomeSection.vue'
+import { mountWithVuetify } from './helpers'
+
+describe('HomeSection', () => {
+  it('renderiza las tres tarjetas de caracteristicas', () => {
+    const wrapper = mountWithVuetify(HomeSection)
+    const texto = wrapper.text()
+
+    expect(texto).toContain('Diseño Minimalista')
+    expect(texto).toContain('Datos Seguros')
+    expect(texto).toContain('Multiples dispositivos')
+  })
+
+  it('resuelve las imagenes de los iconos a rutas de assets, no a require', () => {
+    const wrapper = mountWithVuetify(HomeSection)
+
+    for (const feature of wrapper.vm.features) {
+      expect(typeof feature.img).toBe('string')
+      expect(feature.img.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('no carga el iframe del video mientras el modal esta cerrado', async () => {
+    const wrapper = mountWithVuetify(HomeSection)
+
+    expect(wrapper.find('iframe').exists()).toBe(false)
+
+    wrapper.vm.dialog = true
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('iframe').exists()).toBe(true)
+  })
+})
+```
+
+El segundo test protege el cambio de `require()` a imports: si alguien lo revierte, el valor deja de ser una cadena resoluble. El tercero fija el `v-if` que evita que el vídeo cargue con el modal cerrado.
 
 - [ ] **Step 1: Sustituir los `require()` por imports estáticos**
 
@@ -864,10 +1161,19 @@ Abrir el modal del vídeo con `computer` y confirmar con `read_page` que el ifra
 
 `computer {action: "screenshot"}` de la sección hero y de las tarjetas.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 9: Ejecutar los tests y verlos pasar**
 
 ```bash
-git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/HomeSection.vue
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test home-section
+```
+
+Espera: PASA, los tres tests.
+
+- [ ] **Step 10: Commit**
+
+```bash
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/HomeSection.vue tests/home-section.spec.js
 git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra HomeSection a Vuetify 3 y sustituye vue-youtube-embed por un iframe"
 ```
 
@@ -881,8 +1187,36 @@ Las tres son maquetación con `v-container`/`v-row`/`v-col`/`v-img`, sin lógica
 - Modify: `src/components/AboutSection.vue`, `src/components/DownloadSection.vue`, `src/components/PricingSection.vue`
 
 **Interfaces:**
-- Consumes: nada
+- Consumes: `mountWithVuetify` de `tests/helpers.js`
 - Produces: nada
+
+**Ciclo TDD — leer antes de empezar.** Escribe primero `tests/secciones.spec.js`, ejecútalo con `pnpm test secciones` y **compruébalo en rojo**. Los steps numerados lo ponen en verde. El penúltimo step vuelve a ejecutarlo esperando verde.
+
+```js
+import { describe, it, expect } from 'vitest'
+import AboutSection from '@/components/AboutSection.vue'
+import DownloadSection from '@/components/DownloadSection.vue'
+import PricingSection from '@/components/PricingSection.vue'
+import { mountWithVuetify } from './helpers'
+
+describe.each([
+  ['AboutSection', AboutSection],
+  ['DownloadSection', DownloadSection],
+  ['PricingSection', PricingSection],
+])('%s', (nombre, componente) => {
+  it('monta sin errores', () => {
+    const wrapper = mountWithVuetify(componente)
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  it('no deja rutas de assets con el prefijo ~ de webpack', () => {
+    const wrapper = mountWithVuetify(componente)
+    expect(wrapper.html()).not.toContain('~@/')
+  })
+})
+```
+
+El segundo test es el que importa: una ruta `~@/` sin corregir **no rompe el build**, solo deja la imagen rota en producción. Esta aserción convierte ese fallo silencioso en un test rojo.
 
 - [ ] **Step 1: Corregir todas las rutas `~@/`**
 
@@ -925,10 +1259,19 @@ Espera: una `url(...)` resuelta.
 
 Screenshot de las tres secciones en escritorio y en móvil.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Ejecutar los tests y verlos pasar**
 
 ```bash
-git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/AboutSection.vue src/components/DownloadSection.vue src/components/PricingSection.vue
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test secciones
+```
+
+Espera: PASA, los seis tests (dos por componente).
+
+- [ ] **Step 7: Commit**
+
+```bash
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/AboutSection.vue src/components/DownloadSection.vue src/components/PricingSection.vue tests/secciones.spec.js
 git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra las secciones Acerca, Descarga y Planes a Vuetify 3"
 ```
 
@@ -940,8 +1283,46 @@ git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra las
 - Modify: `src/components/ContactSection.vue`, `src/components/Footer.vue`, `src/views/Error.vue`
 
 **Interfaces:**
-- Consumes: nada
+- Consumes: `mountWithVuetify` de `tests/helpers.js`
 - Produces: nada
+
+**Ciclo TDD — leer antes de empezar.** Escribe primero `tests/contacto.spec.js`, ejecútalo con `pnpm test contacto` y **compruébalo en rojo**. Los steps numerados lo ponen en verde. El penúltimo step vuelve a ejecutarlo esperando verde.
+
+```js
+import { describe, it, expect } from 'vitest'
+import ContactSection from '@/components/ContactSection.vue'
+import Footer from '@/components/Footer.vue'
+import ErrorView from '@/views/Error.vue'
+import { mountWithVuetify } from './helpers'
+
+describe('ContactSection', () => {
+  it('renderiza los campos del formulario', () => {
+    const wrapper = mountWithVuetify(ContactSection)
+
+    expect(wrapper.findAll('input').length).toBeGreaterThan(0)
+    expect(wrapper.find('textarea').exists()).toBe(true)
+  })
+
+  it('no deja rutas de assets con el prefijo ~ de webpack', () => {
+    const wrapper = mountWithVuetify(ContactSection)
+    expect(wrapper.html()).not.toContain('~@/')
+  })
+})
+
+describe('Footer', () => {
+  it('renderiza los enlaces sociales', () => {
+    const wrapper = mountWithVuetify(Footer)
+    expect(wrapper.html()).toContain('youtube.com')
+  })
+})
+
+describe('Error', () => {
+  it('monta sin errores', () => {
+    const wrapper = mountWithVuetify(ErrorView)
+    expect(wrapper.exists()).toBe(true)
+  })
+})
+```
 
 - [ ] **Step 1: Corregir la ruta `~@/` de `ContactSection.vue:65`**
 
@@ -992,10 +1373,19 @@ Enviar el formulario vacío con `computer` y confirmar que aparece el snackbar (
 
 Navegar a `/error` y a `/ruta-que-no-existe`, y confirmar con `read_page` que ambas muestran la vista de error.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Ejecutar los tests y verlos pasar**
 
 ```bash
-git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/ContactSection.vue src/components/Footer.vue src/views/Error.vue
+cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test contacto
+```
+
+Espera: PASA, los cinco tests.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing add src/components/ContactSection.vue src/components/Footer.vue src/views/Error.vue tests/contacto.spec.js
 git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Migra Contacto, Footer y Error a Vuetify 3"
 ```
 
@@ -1035,8 +1425,26 @@ export default [
     },
     rules: {},
   },
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: {
+        global: 'writable',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        vi: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+      },
+    },
+  },
 ]
 ```
+
+El último bloque es necesario porque `vite.config.js` activa `globals: true` en Vitest: sin declararlos, eslint marca `describe`, `it` y `expect` como no definidos en todos los archivos de test.
 
 - [ ] **Step 2: Ejecutar el lint**
 
@@ -1066,14 +1474,15 @@ git -C C:/Desarrollo/Repositorios/viniapro/viniapro-landing commit -m "Configura
 - Consumes: `pnpm build` funcional de las tasks anteriores
 - Produces: imagen que sirve la SPA por nginx en el puerto 80
 
-- [ ] **Step 1: Build de producción**
+- [ ] **Step 1: Suite completa y build de producción**
 
 ```bash
 cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
+pnpm test
 pnpm build
 ```
 
-Espera: termina sin error y genera `dist/index.html` más `dist/assets/`.
+Espera: la suite completa en verde (es la primera vez que se ejecutan todos los archivos de test juntos; un test que pasaba aislado puede fallar aquí por estado compartido en `window`), y el build genera `dist/index.html` más `dist/assets/`.
 
 - [ ] **Step 2: Comprobar el resultado con `preview`**
 
@@ -1294,10 +1703,11 @@ Si pide cambios de umbrales, tocarlos en `display.thresholds` de `src/plugins/vu
 ```bash
 cd C:/Desarrollo/Repositorios/viniapro/viniapro-landing
 pnpm lint
+pnpm test
 pnpm build
 ```
 
-Ambos limpios.
+Los tres limpios.
 
 - [ ] **Step 7: Commit final**
 
