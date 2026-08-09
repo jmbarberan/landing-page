@@ -115,10 +115,6 @@ export default {
         window.open(destino, "_blank")
       }
     },
-    /*irProductos() {
-      //this.$router.push({ name: "productos-lista" })
-      window.location.href = "https://app.viniagent.com";
-    }*/
   },
 
   watch: {
