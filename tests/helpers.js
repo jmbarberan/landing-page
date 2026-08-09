@@ -10,9 +10,8 @@ export function mountWithVuetify(component, options = {}) {
 
   return mount(component, {
     global: {
+      ...globalOptions,
       plugins: [vuetify, i18n, ...(globalOptions.plugins ?? [])],
-      stubs: globalOptions.stubs,
-      mocks: globalOptions.mocks,
     },
     ...rest,
   })
