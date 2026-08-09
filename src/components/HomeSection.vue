@@ -8,7 +8,7 @@
               <h1 class="display-2 font-weight-bold mb-4">ViniaPro</h1>
               <h1 class="font-weight-light">
                 Software de gestion de negocios <br />
-                Flexible, Rápido, fácil de operar <br />
+                Ventas, Inventarios, Proveedores <br />
                 Tecnologia moderna a tu servicio!
               </h1>
               <v-btn
@@ -62,7 +62,7 @@
                     />
                   </svg>
                 </a>
-                <p class="subheading ml-2 mb-0">Vídeo demostrativo</p>
+                <p class="subheading ml-2 mb-0">Canal de Youtube</p>
               </div>
             </v-col>
             <v-col cols="12" md="6" xl="4" class="hidden-sm-and-down"> </v-col>
@@ -134,22 +134,22 @@ export default {
   data() {
     return {
       dialog: false,
-      videoId: "i8IvvHJssWE",
+      videoId: "VI577_4rzjI",
       features: [
         {
           img: require("@/assets/img/icon2.png"),
-          title: "Diseño Simple",
-          text: "Rapido aprendizaje de operacion.",
+          title: "Diseño Minimalista",
+          text: "Sin complicaciones, rápido aprendizaje de operacion.",
         },
         {
           img: require("@/assets/img/icon1.png"),
           title: "Datos Seguros",
-          text: "Arquitectura solida y confiable.",
+          text: "Plataforma robusta, confiable y de optima respuesta",
         },
         {
           img: require("@/assets/img/icon3.png"),
-          title: "Codigo Abierto",
-          text: "Codigo fuente para su auto mantenimiento.",
+          title: "Multiples dispositivos",
+          text: "Accede en cualquier dispositivo desde cualquier lugar.",
         },
       ],
     };

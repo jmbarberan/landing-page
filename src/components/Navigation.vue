@@ -73,12 +73,12 @@
         <v-btn text @click="$vuetify.goTo('#contact')">
           <span class="mr-2">{{ $t("menu.contacto") }}</span>
         </v-btn>
-        <!--v-btn rounded outlined text :href="appurl" target="_blank" color="primary">
-          <span class="mr-2">Acceder</span>
-        </v-btn-->
-        <v-btn rounded outlined text @click="irProductos()" color="primary">
+        <v-btn rounded outlined text :href="appurl" target="_blank" color="primary">
           <span class="mr-2">Acceder</span>
         </v-btn>
+        <!--v-btn rounded outlined text @click="irProductos()" color="primary">
+          <span class="mr-2">Acceder</span>
+        </v-btn-->
       </div>
     </v-app-bar>
   </div>
@@ -101,7 +101,7 @@ export default {
     drawer: null,
     isXs: false,
     items: [],
-    appurl: "https://viniapro.com/productos"
+    appurl: "https://app.viniapro.com"
   }),
   props: {
     color: String,
@@ -118,10 +118,10 @@ export default {
         window.open(destino, "_blank")
       }
     },
-    irProductos() {
+    /*irProductos() {
       //this.$router.push({ name: "productos-lista" })
       window.location.href = "https://app.viniapro.com";
-    }
+    }*/
   },
 
   watch: {

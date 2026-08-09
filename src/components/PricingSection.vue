@@ -4,7 +4,7 @@
       <v-row align="center" justify="center">
         <v-col cols="10">
           <v-card style="width: 100%">
-            <h1 class="text-center pt-6 font-weight-light display-2">Planos</h1>
+            <h1 class="text-center pt-6 font-weight-light display-2">Planes</h1>
             <v-divider class="my-6"></v-divider>
             <v-row class="text-center">
               <v-col class="col-12 col-sm-6 col-md-4">
@@ -19,21 +19,22 @@
                     </div>
                     <div class="text--disabled text-uppercase text-h5 my-2">Básico</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Domínios personalizados</div>
+                    <div class="text-uppercase blue--text">Facturción electrónica</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Limite de 1000 acessos diários</div>
+                    <div class="text-uppercase blue--text">Ventas a credito</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Outras características...</div>
+                    <div class="text-uppercase blue--text">Control de inventarios</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase text-h4 mt-6 blue--text">R$ 20,00</div>
+                    <div class="text-uppercase text-h4 mt-6 blue--text">$ 180</div>
                     <v-btn
                         v-bind="size"
                         rounded
                         outlined
                         color="blue"
                         class="mt-6"
+                        @click="mensajePlan('Básico')"
                     >
-                      Comece Agora!
+                      Comenzar ya!
                     </v-btn>
                   </v-card-text>
                   <v-divider style="margin-right: -23px" vertical v-if="this.$vuetify.breakpoint.smAndUp"></v-divider>
@@ -50,23 +51,24 @@
                         </div>
                       </div>
                     </div>
-                    <div class="text--disabled text-uppercase text-h5 my-2">Padrão</div>
+                    <div class="text--disabled text-uppercase text-h5 my-2">Contable</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Domínios personalizados</div>
+                    <div class="text-uppercase blue--text">Caracteristicas del plan básico</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Limite de 10000 acessos diários</div>
+                    <div class="text-uppercase blue--text">Contabilidad</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Outras características...</div>
+                    <div class="text-uppercase blue--text">Estados financieros</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase text-h4 mt-6 blue--text">R$ 100,00</div>
+                    <div class="text-uppercase text-h4 mt-6 blue--text">$ 240</div>
                     <v-btn
                         v-bind="size"
                         rounded
                         outlined
                         color="blue"
                         class="mt-6"
+                        @click="mensajePlan('Contable')"
                     >
-                      Comece Agora!
+                      Comenzar ya!
                     </v-btn>
                   </v-card-text>
                   <v-divider style="margin-right: -23px" vertical v-if="this.$vuetify.breakpoint.mdAndUp"></v-divider>
@@ -85,23 +87,24 @@
                         </div>
                       </div>
                     </div>
-                    <div class="text--disabled text-uppercase text-h5 my-2">Empresarial</div>
+                    <div class="text--disabled text-uppercase text-h5 my-2">ERP</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Domínios personalizados</div>
+                    <div class="text-uppercase blue--text">Caracteristicas del plan contable</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Acessos ilimitados</div>
+                    <div class="text-uppercase blue--text">Nomina de empleados</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase blue--text">Outras características...</div>
+                    <div class="text-uppercase blue--text">Roles de pago</div>
                     <v-divider class="my-2"/>
-                    <div class="text-uppercase text-h4 mt-6 blue--text">R$ 500,00</div>
+                    <div class="text-uppercase text-h4 mt-6 blue--text">$ 300</div>
                     <v-btn
                         v-bind="size"
                         rounded
                         outlined
                         color="blue"
                         class="mt-6"
+                        @click="mensajePlan('ERP')"
                     >
-                      Comece Agora!
+                      Comenzar ya!
                     </v-btn>
                   </v-card-text>
                 </div>
@@ -229,10 +232,10 @@ section {
 <script>
 export default {
   data: () => ({
-    planos: [
+    planes: [
       {
         title: "Básico",
-        price: "R$100,00",
+        price: "$180",
         img: "f1.png",
         features: [
           {
@@ -266,8 +269,8 @@ export default {
         ],
       },
       {
-        title: "Padrão",
-        price: "R$150,00",
+        title: "Contable",
+        price: "$240",
         img: "f2.png",
         features: [
           {
@@ -303,8 +306,8 @@ export default {
         ],
       },
       {
-        title: "Premium",
-        price: "R$250,00",
+        title: "ERP",
+        price: "$300",
         img: "f3.png",
         features: [
           {
@@ -350,5 +353,10 @@ export default {
       return size ? {[size]: true} : {};
     }
   },
+  methods: {
+    mensajePlan(plan) {
+      window.location.href = "https://wa.me/593989036143?text=Hola,%20Nececito%20informacion%20sobre%20el%20plan%20" + plan;
+    }
+  }
 };
 </script>

@@ -7,19 +7,19 @@
             <v-col cols="12" sm="5">
               <h1 class="font-weight-light display-1">Contactenos</h1>
               <h3 class="font-weight-light mt-3">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste
-                explicabo commodi quisquam asperiores dolore ad enim provident
-                veniam perferendis voluptate, perspiciatis.
+                En VINIAPRO queremos saber de ti. Escribenos un mensaje
+                resolveremos cualquier inquietud sobre nuestro servicio
+                nos podremos en contacto contigo pronto.
               </h3>
               <h3 class="font-weight-light mt-3">
-                Lorem ipsum dolor sit amet consectetur adipisicing.
+                Puedes contactarnos tambien por estos canales.
               </h3>
-              <h3 class="font-weight-light mt-3">
-                Teléfono: +xx (xx) xxxxx-xxxx
-              </h3>
-              <h3 class="font-weight-light">
-                Email: email@email.com
-              </h3>
+              <a class="font-weight-light mt-3" href="https://wa.me/593989036143">
+                <h3>Teléfono: +593 98 903-6143</h3>
+              </a>
+              <a class="font-weight-light" href="mailto:gerencia@novainsersa.ec">
+                <h3>Email: sales@viniapro.com</h3>
+              </a>
             </v-col>
             <v-col cols="12" sm="7">
               <v-form ref="form" v-model="valid" :lazy-validation="lazy">

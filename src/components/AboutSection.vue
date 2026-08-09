@@ -7,7 +7,7 @@
             <v-col cols="12" md="7">
               <h1 class="font-weight-light display-2">Acerca de</h1>
               <h1 class="font-weight-light display-1 mb-3">
-                Software Ecuador
+                ViniaPro
               </h1>
               <v-row>
                 <v-col cols="12" class="d-flex align-center">
@@ -17,9 +17,9 @@
                     class="mr-4"
                   />
                   <p class="text-justify">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                    VINIAPRO es un Sistema Administrativo Integrado, adaptable 
+                    a gran variedad de negocios (como supermercados, ferreterías, 
+                    farmacias, tiendas en línea, etc.), facil aprender y operar.
                   </p>
                 </v-col>
                 <v-col cols="12" class="d-flex align-center">
@@ -29,9 +29,9 @@
                     class="mr-4"
                   />
                   <p class="text-justify">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                    Ayuda a optimizar sus operaciones, a planificar sus finanzas y 
+                    automatizar procesos con datos fiables y varios niveles de 
+                    seguridad. Disponga de la información de su negocio en tiempo real.
                   </p>
                 </v-col>
                 <v-col cols="12" class="d-flex align-center">
@@ -41,9 +41,9 @@
                     class="mr-4"
                   />
                   <p class="text-justify">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                    VINIAPRO funciona en una amplia gama de dispositivos: computadoras, 
+                    tabletas, teléfonos inteligentes; puede operar desde cualquier lugar 
+                    por medio de internet. y localmente con sus propios equipos
                   </p>
                 </v-col>
               </v-row>

@@ -39,15 +39,15 @@ export default {
     icons: [
       {
         text: "mdi-facebook",
-        link: "https://www.facebook.com/martin.barberan/",
+        link: "https://www.facebook.com/viniapro",
       },
       {
         text: "mdi-twitter",
         link: "https://twitter.com/MartinBarberan1",
       },
       {
-        text: "mdi-linkedin",
-        link: "https://www.linkedin.com/in/martin-barberan-07824151/",
+        text: "mdi-youtube",
+        link: "https://www.youtube.com/channel/UC53mj3FYRO49GuvN1qfF87Q",
       },
       {
         text: "mdi-instagram",
