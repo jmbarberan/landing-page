@@ -115,7 +115,7 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-dialog v-model="dialog" max-width="640px" attach>
+    <v-dialog v-model="dialog" max-width="640px">
       <v-card>
         <iframe
           v-if="dialog"
