@@ -1,6 +1,6 @@
 <template>
   <section id="hero">
-    <v-parallax dark src="@/assets/img/bgHero.jpg" height="750">
+    <v-parallax src="@/assets/img/bgHero.jpg" height="750" class="text-white">
       <v-row align="center" justify="center">
         <v-col cols="10">
           <v-row align="center" justify="center">
@@ -16,7 +16,7 @@
                 outlined
                 large
                 dark
-                @click="$vuetify.goTo('#features')"
+                @click="goTo('#features')"
                 class="mt-5"
               >
                 Saber más
@@ -90,18 +90,19 @@
               v-for="(feature, i) in features"
               :key="i"
             >
-              <v-hover v-slot:default="{ hover }">
+              <v-hover v-slot="{ isHovering, props }">
                 <v-card
+                  v-bind="props"
                   class="card"
-                  shaped
-                  :elevation="hover ? 10 : 4"
-                  :class="{ up: hover }"
+                  rounded="lg"
+                  :elevation="isHovering ? 10 : 4"
+                  :class="{ up: isHovering }"
                 >
                   <v-img
                     :src="feature.img"
                     max-width="100px"
                     class="d-block ml-auto mr-auto"
-                    :class="{ 'zoom-efect': hover }"
+                    :class="{ 'zoom-efect': isHovering }"
                   ></v-img>
                   <h1 class="font-weight-regular">{{ feature.title }}</h1>
                   <h4 class="font-weight-regular subtitle-1">
@@ -114,74 +115,57 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-dialog v-model="dialog" max-width="640px">
+    <v-dialog v-model="dialog" max-width="640px" attach>
       <v-card>
-        <youtube
-          :video-id="videoId"
-          @ready="ready"
-          @playing="playing"
-        ></youtube>
+        <iframe
+          v-if="dialog"
+          class="video-frame"
+          :src="`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`"
+          title="Demostración de ViniaPro"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
       </v-card>
     </v-dialog>
     <div class="svg-border-waves">
-      <img src="~@/assets/img/wave2.svg" />
+      <img src="@/assets/img/wave2.svg" />
     </div>
   </section>
 </template>
 
 <script>
+import { useGoTo } from "vuetify";
+import icon1 from "@/assets/img/icon1.png";
+import icon2 from "@/assets/img/icon2.png";
+import icon3 from "@/assets/img/icon3.png";
+
 export default {
+  setup() {
+    return { goTo: useGoTo() };
+  },
   data() {
     return {
       dialog: false,
       videoId: "VI577_4rzjI",
       features: [
         {
-          img: require("@/assets/img/icon2.png"),
+          img: icon2,
           title: "Diseño Minimalista",
           text: "Sin complicaciones, rápido aprendizaje de operacion.",
         },
         {
-          img: require("@/assets/img/icon1.png"),
+          img: icon1,
           title: "Datos Seguros",
           text: "Plataforma robusta, confiable y de optima respuesta",
         },
         {
-          img: require("@/assets/img/icon3.png"),
+          img: icon3,
           title: "Multiples dispositivos",
           text: "Accede en cualquier dispositivo desde cualquier lugar.",
         },
       ],
     };
-  },
-  watch: {
-    dialog(value) {
-      if (!value) {
-        this.pause();
-      }
-    },
-  },
-  methods: {
-    ready(event) {
-      this.player = event.target;
-    },
-    playing(event) {
-      // The player is playing a video.
-      console.log(event);
-    },
-    change() {
-      // when you change the value, the player will also change.
-      // If you would like to change `playerVars`, please change it before you change `videoId`.
-      // If `playerVars.autoplay` is 1, `loadVideoById` will be called.
-      // If `playerVars.autoplay` is 0, `cueVideoById` will be called.
-      this.videoId = "another video id";
-    },
-    stop() {
-      this.player.stopVideo();
-    },
-    pause() {
-      this.player.pauseVideo();
-    },
   },
 };
 </script>
@@ -293,6 +277,13 @@ export default {
 .up {
   transform: translateY(-20px);
   transition: 0.5s ease-out;
+}
+
+.video-frame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
 }
 </style>
 
