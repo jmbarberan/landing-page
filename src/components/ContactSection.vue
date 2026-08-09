@@ -18,7 +18,7 @@
                 <h3>Teléfono: +593 98 903-6143</h3>
               </a>
               <a class="font-weight-light" href="mailto:gerencia@novainsersa.ec">
-                <h3>Email: sales@viniapro.com</h3>
+                <h3>Email: sales@viniagent.com</h3>
               </a>
             </v-col>
             <v-col cols="12" sm="7">

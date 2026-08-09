@@ -101,7 +101,7 @@ export default {
     drawer: null,
     isXs: false,
     items: [],
-    appurl: "https://app.viniapro.com"
+    appurl: "https://app.viniagent.com"
   }),
   props: {
     color: String,
