@@ -13,7 +13,7 @@ describe('App', () => {
       },
     })
 
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.findComponent(App).exists()).toBe(true)
   })
 })
 

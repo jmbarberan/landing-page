@@ -20,7 +20,8 @@ describe('Navigation', () => {
       props: { color: 'transparent', flat: true },
     })
 
-    expect(wrapper.vm.items).toHaveLength(6)
-    expect(wrapper.vm.items[0][2]).toBe('#hero')
+    const navegacion = wrapper.findComponent(Navigation).vm
+    expect(navegacion.items).toHaveLength(6)
+    expect(navegacion.items[0][2]).toBe('#hero')
   })
 })
