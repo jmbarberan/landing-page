@@ -4,3 +4,9 @@
     <p>Vuelva a la pagina anterior</p>
   </div>
 </template>
+
+<script>
+export default {
+  name: "ErrorPage",
+};
+</script>

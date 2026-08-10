@@ -1,14 +1,30 @@
 <template>
   <section id="hero">
-    <v-parallax src="@/assets/img/bgHero.jpg" height="750" class="text-white">
-      <v-row align="center" justify="center">
+    <v-parallax
+      src="@/assets/img/bgHero.jpg"
+      height="750"
+      class="text-white"
+    >
+      <v-row
+        align="center"
+        justify="center"
+      >
         <v-col cols="10">
-          <v-row align="center" justify="center">
-            <v-col cols="12" md="6" xl="8">
-              <h1 class="display-2 font-weight-bold mb-4">ViniaPro</h1>
+          <v-row
+            align="center"
+            justify="center"
+          >
+            <v-col
+              cols="12"
+              md="6"
+              xl="8"
+            >
+              <h1 class="display-2 font-weight-bold mb-4">
+                ViniaPro
+              </h1>
               <h1 class="font-weight-light">
-                Software de gestion de negocios <br />
-                Ventas, Inventarios, Proveedores <br />
+                Software de gestion de negocios <br>
+                Ventas, Inventarios, Proveedores <br>
                 Tecnologia moderna a tu servicio!
               </h1>
               <v-btn
@@ -16,14 +32,19 @@
                 variant="outlined"
                 size="large"
                 theme="dark"
-                @click="goTo('#features')"
                 class="mt-5"
+                @click="goTo('#features')"
               >
                 Saber más
-                <v-icon class="ml-2">mdi-arrow-down</v-icon>
+                <v-icon class="ml-2">
+                  mdi-arrow-down
+                </v-icon>
               </v-btn>
               <div class="video d-flex align-center py-4">
-                <a @click.stop="dialog = true" class="playBut">
+                <a
+                  class="playBut"
+                  @click.stop="dialog = true"
+                >
                   <svg
                     version="1.1"
                     xmlns="http://www.w3.org/2000/svg"
@@ -38,8 +59,8 @@
                     xml:space="preserve"
                   >
                     <polygon
-                      class="triangle"
                       id="XMLID_18_"
+                      class="triangle"
                       fill="none"
                       stroke-width="7"
                       stroke-linecap="round"
@@ -49,8 +70,8 @@
                     />
 
                     <circle
-                      class="circle"
                       id="XMLID_17_"
+                      class="circle"
                       fill="none"
                       stroke-width="7"
                       stroke-linecap="round"
@@ -62,10 +83,17 @@
                     />
                   </svg>
                 </a>
-                <p class="subheading ml-2 mb-0">Canal de Youtube</p>
+                <p class="subheading ml-2 mb-0">
+                  Canal de Youtube
+                </p>
               </div>
             </v-col>
-            <v-col cols="12" md="6" xl="4" class="hidden-sm-and-down"> </v-col>
+            <v-col
+              cols="12"
+              md="6"
+              xl="4"
+              class="hidden-sm-and-down"
+            />
           </v-row>
         </v-col>
       </v-row>
@@ -73,10 +101,20 @@
         <v-img src="@/assets/img/borderWaves.svg" />
       </div>
     </v-parallax>
-    <v-container fluid id="features" class="mt-2">
-      <v-row align="center" justify="center">
+    <v-container
+      id="features"
+      fluid
+      class="mt-2"
+    >
+      <v-row
+        align="center"
+        justify="center"
+      >
         <v-col cols="10">
-          <v-row align="center" justify="space-around">
+          <v-row
+            align="center"
+            justify="space-around"
+          >
             <!-- <v-col cols="12" class="text-center">
               <h1 class="font-weight-light display-2">Title</h1>
               <h1 class="font-weight-light">
@@ -84,11 +122,11 @@
               </h1>
             </v-col> -->
             <v-col
+              v-for="(feature, i) in features"
+              :key="i"
               cols="12"
               sm="4"
               class="text-center"
-              v-for="(feature, i) in features"
-              :key="i"
             >
               <v-hover v-slot="{ isHovering, props }">
                 <v-card
@@ -103,8 +141,10 @@
                     max-width="100px"
                     class="d-block ml-auto mr-auto"
                     :class="{ 'zoom-efect': isHovering }"
-                  ></v-img>
-                  <h1 class="font-weight-regular">{{ feature.title }}</h1>
+                  />
+                  <h1 class="font-weight-regular">
+                    {{ feature.title }}
+                  </h1>
                   <h4 class="font-weight-regular subtitle-1">
                     {{ feature.text }}
                   </h4>
@@ -115,7 +155,10 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-dialog v-model="dialog" max-width="640px">
+    <v-dialog
+      v-model="dialog"
+      max-width="640px"
+    >
       <v-card>
         <iframe
           v-if="dialog"
@@ -125,11 +168,11 @@
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen
-        ></iframe>
+        />
       </v-card>
     </v-dialog>
     <div class="svg-border-waves">
-      <img src="@/assets/img/wave2.svg" />
+      <img src="@/assets/img/wave2.svg">
     </div>
   </section>
 </template>

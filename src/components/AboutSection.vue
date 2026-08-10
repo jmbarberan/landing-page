@@ -1,16 +1,30 @@
 <template>
   <section id="about">
     <v-container fluid>
-      <v-row align="center" justify="center">
+      <v-row
+        align="center"
+        justify="center"
+      >
         <v-col cols="10">
-          <v-row align="center" justify="center">
-            <v-col cols="12" md="7">
-              <h1 class="font-weight-light display-2">Acerca de</h1>
+          <v-row
+            align="center"
+            justify="center"
+          >
+            <v-col
+              cols="12"
+              md="7"
+            >
+              <h1 class="font-weight-light display-2">
+                Acerca de
+              </h1>
               <h1 class="font-weight-light display-1 mb-3">
                 ViniaPro - Agent
               </h1>
               <v-row>
-                <v-col cols="12" class="d-flex align-center">
+                <v-col
+                  cols="12"
+                  class="d-flex align-center"
+                >
                   <v-img
                     src="@/assets/img/icon1.svg"
                     max-width="60px"
@@ -22,7 +36,10 @@
                     farmacias, tiendas en línea, etc.), facil aprender y operar.
                   </p>
                 </v-col>
-                <v-col cols="12" class="d-flex align-center">
+                <v-col
+                  cols="12"
+                  class="d-flex align-center"
+                >
                   <v-img
                     src="@/assets/img/icon2.svg"
                     max-width="60px"
@@ -34,7 +51,10 @@
                     seguridad. Disponga de la información de su negocio en tiempo real.
                   </p>
                 </v-col>
-                <v-col cols="12" class="d-flex align-center">
+                <v-col
+                  cols="12"
+                  class="d-flex align-center"
+                >
                   <v-img
                     src="@/assets/img/icon3.svg"
                     max-width="60px"
@@ -48,7 +68,11 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="12" md="5" class="d-none d-md-flex">
+            <v-col
+              cols="12"
+              md="5"
+              class="d-none d-md-flex"
+            >
               <v-img
                 src="@/assets/img/ill1.svg"
                 class="d-block ml-auto mr-auto"

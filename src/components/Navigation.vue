@@ -7,10 +7,16 @@
       image="@/assets/img/bgDrawer.jpg"
     >
       <v-list>
-        <v-list-item title="Software" subtitle="Ecuador">
+        <v-list-item
+          title="Software"
+          subtitle="Ecuador"
+        >
           <template #prepend>
             <v-avatar>
-              <img src="@/assets/img/logo.png" alt="Logo" />
+              <img
+                src="@/assets/img/logo.png"
+                alt="Logo"
+              >
             </v-avatar>
           </template>
         </v-list-item>
@@ -41,31 +47,55 @@
       :class="{ expand: flat }"
     >
       <v-toolbar-title>
-        <v-img src="@/assets/img/logo.png" max-width="50px" />
+        <v-img
+          src="@/assets/img/logo.png"
+          max-width="50px"
+        />
       </v-toolbar-title>
       <v-spacer />
       <v-app-bar-nav-icon
-        @click.stop="drawer = !drawer"
-        class="mr-4"
         v-if="isXs"
+        class="mr-4"
+        @click.stop="drawer = !drawer"
       />
       <div v-else>
-        <v-btn variant="text" @click="goTo('#hero')">
+        <v-btn
+          variant="text"
+          @click="goTo('#hero')"
+        >
           <span class="mr-2">{{ $t('menu.home') }}</span>
         </v-btn>
-        <v-btn variant="text" @click="goTo('#features')">
+        <v-btn
+          variant="text"
+          @click="goTo('#features')"
+        >
           <span class="mr-2">{{ $t("menu.acerca") }}</span>
         </v-btn>
-        <v-btn variant="text" @click="goTo('#download')">
+        <v-btn
+          variant="text"
+          @click="goTo('#download')"
+        >
           <span class="mr-2">{{ $t("menu.demo") }}</span>
         </v-btn>
-        <v-btn variant="text" @click="goTo('#pricing')">
+        <v-btn
+          variant="text"
+          @click="goTo('#pricing')"
+        >
           <span class="mr-2">{{ $t("menu.planes") }}</span>
         </v-btn>
-        <v-btn variant="text" @click="goTo('#contact')">
+        <v-btn
+          variant="text"
+          @click="goTo('#contact')"
+        >
           <span class="mr-2">{{ $t("menu.contacto") }}</span>
         </v-btn>
-        <v-btn rounded variant="outlined" :href="appurl" target="_blank" color="primary">
+        <v-btn
+          rounded
+          variant="outlined"
+          :href="appurl"
+          target="_blank"
+          color="primary"
+        >
           <span class="mr-2">Ingresar</span>
         </v-btn>
       </div>
@@ -73,21 +103,15 @@
   </div>
 </template>
 
-<style scoped>
-.v-toolbar {
-  transition: 0.6s;
-}
-
-.expand {
-  height: 80px !important;
-  padding-top: 10px;
-}
-</style>
-
 <script>
 import { useGoTo } from "vuetify";
 
 export default {
+  name: "AppNavigation",
+  props: {
+    color: String,
+    flat: Boolean,
+  },
   setup() {
     return { goTo: useGoTo() };
   },
@@ -97,22 +121,6 @@ export default {
     items: [],
     appurl: "https://app.viniagent.com"
   }),
-  props: {
-    color: String,
-    flat: Boolean,
-  },
-  methods: {
-    onResize() {
-      this.isXs = window.innerWidth < 850;
-    },
-    navegar(destino) {
-      if (destino.startsWith("#")) {
-        this.goTo(destino)
-      } else {
-        window.open(destino, "_blank")
-      }
-    },
-  },
 
   watch: {
     isXs(value) {
@@ -137,5 +145,28 @@ export default {
     this.onResize();
     window.addEventListener("resize", this.onResize, { passive: true });
   },
+  methods: {
+    onResize() {
+      this.isXs = window.innerWidth < 850;
+    },
+    navegar(destino) {
+      if (destino.startsWith("#")) {
+        this.goTo(destino)
+      } else {
+        window.open(destino, "_blank")
+      }
+    },
+  },
 };
 </script>
+
+<style scoped>
+.v-toolbar {
+  transition: 0.6s;
+}
+
+.expand {
+  height: 80px !important;
+  padding-top: 10px;
+}
+</style>

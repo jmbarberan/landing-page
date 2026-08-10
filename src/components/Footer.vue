@@ -1,6 +1,13 @@
 <template>
-  <v-footer theme="dark" class="pa-0">
-    <v-card flat tile class="secondary white--text text-center">
+  <v-footer
+    theme="dark"
+    class="pa-0"
+  >
+    <v-card
+      flat
+      tile
+      class="secondary white--text text-center"
+    >
       <v-card-text>
         <v-btn
           v-for="(icon, i) in icons"
@@ -10,7 +17,9 @@
           target="_blank"
           icon
         >
-          <v-icon size="24px">{{ icon.text }}</v-icon>
+          <v-icon size="24px">
+            {{ icon.text }}
+          </v-icon>
         </v-btn>
       </v-card-text>
 
@@ -18,7 +27,7 @@
         Siga nuestras cuentas en las redes sociales para tutoriales, tips, y mucho mas.
       </v-card-text>
 
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-card-text class="white--text">
         {{ new Date().getFullYear() }} — <strong>Software Ecuador</strong>
@@ -27,14 +36,9 @@
   </v-footer>
 </template>
 
-<style scoped>
-.v-card {
-  width: 100%;
-}
-</style>
-
 <script>
 export default {
+  name: "AppFooter",
   data: () => ({
     icons: [
       {
@@ -57,3 +61,9 @@ export default {
   }),
 };
 </script>
+
+<style scoped>
+.v-card {
+  width: 100%;
+}
+</style>

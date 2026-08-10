@@ -1,11 +1,22 @@
 <template>
-  <section class="pb-8" id="contact">
+  <section
+    id="contact"
+    class="pb-8"
+  >
     <v-container fluid>
-      <v-row align="center" justify="center">
+      <v-row
+        align="center"
+        justify="center"
+      >
         <v-col cols="10">
           <v-row justify="center">
-            <v-col cols="12" sm="5">
-              <h1 class="font-weight-light display-1">Contactenos</h1>
+            <v-col
+              cols="12"
+              sm="5"
+            >
+              <h1 class="font-weight-light display-1">
+                Contactenos
+              </h1>
               <h3 class="font-weight-light mt-3">
                 En VINIAPRO queremos saber de ti. Escribenos un mensaje
                 resolveremos cualquier inquietud sobre nuestro servicio
@@ -14,43 +25,55 @@
               <h3 class="font-weight-light mt-3">
                 Puedes contactarnos tambien por estos canales.
               </h3>
-              <a class="font-weight-light mt-3" href="https://wa.me/593989036143">
+              <a
+                class="font-weight-light mt-3"
+                href="https://wa.me/593989036143"
+              >
                 <h3>Teléfono: +593 98 903-6143</h3>
               </a>
-              <a class="font-weight-light" href="mailto:gerencia@novainsersa.ec">
+              <a
+                class="font-weight-light"
+                href="mailto:gerencia@novainsersa.ec"
+              >
                 <h3>Email: sales@viniagent.com</h3>
               </a>
             </v-col>
-            <v-col cols="12" sm="7">
-              <v-form ref="form" v-model="valid">
+            <v-col
+              cols="12"
+              sm="7"
+            >
+              <v-form
+                ref="form"
+                v-model="valid"
+              >
                 <v-text-field
-                    v-model="name"
-                    :rules="nameRules"
-                    label="Nombre"
-                    required
-                ></v-text-field>
+                  v-model="name"
+                  :rules="nameRules"
+                  label="Nombre"
+                  required
+                />
 
                 <v-text-field
-                    v-model="email"
-                    :rules="emailRules"
-                    label="E-mail"
-                    required
-                ></v-text-field>
+                  v-model="email"
+                  :rules="emailRules"
+                  label="E-mail"
+                  required
+                />
 
                 <v-textarea
-                    v-model="textArea"
-                    :rules="textAreaRules"
-                    label="Mensaje"
-                    required
+                  v-model="textArea"
+                  :rules="textAreaRules"
+                  label="Mensaje"
+                  required
                 />
 
                 <v-btn
-                    :disabled="!valid"
-                    color="primary"
-                    rounded
-                    block
-                    class="mt-3"
-                    @click="submit"
+                  :disabled="!valid"
+                  color="primary"
+                  rounded
+                  block
+                  class="mt-3"
+                  @click="submit"
                 >
                   Enviar
                 </v-btn>
@@ -61,20 +84,20 @@
       </v-row>
     </v-container>
     <div class="svg-border-waves text-white">
-      <v-img src="@/assets/img/borderWavesBlue.svg"/>
+      <v-img src="@/assets/img/borderWavesBlue.svg" />
     </div>
     <v-snackbar
-        v-model="snackbar.enabled"
-        timeout="3000"
-        location="top right"
-        :color="snackbar.color"
+      v-model="snackbar.enabled"
+      timeout="3000"
+      location="top right"
+      :color="snackbar.color"
     >
       {{ snackbar.text }}
 
       <template #actions>
         <v-btn
-            variant="text"
-            @click="snackbar.enabled = false"
+          variant="text"
+          @click="snackbar.enabled = false"
         >
           Cerrar
         </v-btn>
@@ -82,22 +105,6 @@
     </v-snackbar>
   </section>
 </template>
-
-<style scoped>
-#contact {
-  background-color: #f4f7f5;
-}
-
-.svg-border-waves .v-image {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3rem;
-  width: 100%;
-  overflow: hidden;
-}
-
-</style>
 
 <script>
 // import {db} from '@/main'
@@ -152,3 +159,19 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+#contact {
+  background-color: #f4f7f5;
+}
+
+.svg-border-waves .v-image {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+</style>
