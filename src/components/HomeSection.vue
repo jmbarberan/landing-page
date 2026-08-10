@@ -277,7 +277,8 @@ export default {
   transition: 0.2s;
 }
 
-.svg-border-waves .v-image {
+/* Vuetify 3 renombro .v-image a .v-img */
+.svg-border-waves .v-img {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -288,6 +289,18 @@ export default {
 
 #hero {
   z-index: 0;
+}
+
+/*
+  Vuetify 2 centraba el contenido del parallax con flex en .v-parallax__content.
+  En Vuetify 3 el parallax se apoya en v-img y su contenedor pasa a ser
+  .v-responsive__content, que es display: block: sin esto el contenido se pega
+  arriba y el <h1> queda por debajo de la barra superior.
+*/
+#hero .v-parallax > .v-responsive__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .svg-border-waves img {
   position: absolute;
@@ -304,7 +317,7 @@ export default {
   transition: 0.5s ease-out;
 }
 
-.card .v-image {
+.card .v-img {
   margin-bottom: 15px;
   transition: 0.75s;
 }

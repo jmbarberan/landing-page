@@ -165,7 +165,8 @@ export default {
   background-color: #f4f7f5;
 }
 
-.svg-border-waves .v-image {
+/* Vuetify 3 renombro .v-image a .v-img */
+.svg-border-waves .v-img {
   position: absolute;
   bottom: 0;
   left: 0;
