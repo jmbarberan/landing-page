@@ -14,7 +14,7 @@
                 de contacto, escribanos para coordinar la misma, si ya eres
                 subscriptor puedes acceder con tu cuenta para descargar la App.
               </h1>
-              <v-btn rounded outlined href="https://app.viniagent.com" target="_blank" large color="white" class="mt-4">
+              <v-btn rounded variant="outlined" href="https://app.viniagent.com" target="_blank" size="large" color="white" class="mt-4">
                 <v-icon class="mr-2">
                   mdi-login
                 </v-icon>
@@ -30,7 +30,7 @@
 
 <style scoped>
 #download {
-  background-image: url("~@/assets/img/bgDownload.jpg");
+  background-image: url("@/assets/img/bgDownload.jpg");
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-size: cover;

@@ -13,7 +13,7 @@
                     <div class="flex-center">
                       <div class="circle1">
                         <div class="circle2">
-                          <v-img src="~@/assets/img/paperplane.svg"></v-img>
+                          <v-img src="@/assets/img/paperplane.svg"></v-img>
                         </div>
                       </div>
                     </div>
@@ -29,7 +29,7 @@
                     <v-btn
                         v-bind="size"
                         rounded
-                        outlined
+                        variant="outlined"
                         color="blue"
                         class="mt-6"
                         @click="mensajePlan('Básico')"
@@ -37,9 +37,9 @@
                       Comenzar ya!
                     </v-btn>
                   </v-card-text>
-                  <v-divider style="margin-right: -23px" vertical v-if="this.$vuetify.breakpoint.smAndUp"></v-divider>
+                  <v-divider style="margin-right: -23px" vertical v-if="smAndUp"></v-divider>
                 </div>
-                <v-divider class="mx-4" v-if="!this.$vuetify.breakpoint.smAndUp"></v-divider>
+                <v-divider class="mx-4" v-if="!smAndUp"></v-divider>
               </v-col>
               <v-col class="col-12 col-sm-6 col-md-4">
                 <div class="flex-center">
@@ -47,7 +47,7 @@
                     <div class="flex-center">
                       <div class="circle1">
                         <div class="circle2">
-                          <v-img src="~@/assets/img/airplane.svg"/>
+                          <v-img src="@/assets/img/airplane.svg"/>
                         </div>
                       </div>
                     </div>
@@ -63,7 +63,7 @@
                     <v-btn
                         v-bind="size"
                         rounded
-                        outlined
+                        variant="outlined"
                         color="blue"
                         class="mt-6"
                         @click="mensajePlan('Contable')"
@@ -71,19 +71,19 @@
                       Comenzar ya!
                     </v-btn>
                   </v-card-text>
-                  <v-divider style="margin-right: -23px" vertical v-if="this.$vuetify.breakpoint.mdAndUp"></v-divider>
+                  <v-divider style="margin-right: -23px" vertical v-if="mdAndUp"></v-divider>
                 </div>
-                <v-divider class="mx-4" v-if="!this.$vuetify.breakpoint.smAndUp"></v-divider>
+                <v-divider class="mx-4" v-if="!smAndUp"></v-divider>
               </v-col>
               <v-col class="col-12 col-md-4">
-                <v-divider v-if="this.$vuetify.breakpoint.smOnly" class="mx-4"></v-divider>
+                <v-divider v-if="smOnly" class="mx-4"></v-divider>
 
                 <div class="flex-center">
                   <v-card-text>
                     <div class="flex-center">
                       <div class="circle1">
                         <div class="circle2">
-                          <v-img src="~@/assets/img/aeroplane.svg"/>
+                          <v-img src="@/assets/img/aeroplane.svg"/>
                         </div>
                       </div>
                     </div>
@@ -99,7 +99,7 @@
                     <v-btn
                         v-bind="size"
                         rounded
-                        outlined
+                        variant="outlined"
                         color="blue"
                         class="mt-6"
                         @click="mensajePlan('ERP')"
@@ -230,7 +230,13 @@ section {
 </style>
 
 <script>
+import { useDisplay } from 'vuetify'
+
 export default {
+  setup() {
+    const { smAndUp, mdAndUp, smOnly, name } = useDisplay()
+    return { smAndUp, mdAndUp, smOnly, name }
+  },
   data: () => ({
     planes: [
       {
@@ -347,10 +353,8 @@ export default {
   }),
   computed: {
     size() {
-      const size = {md: "large", xl: "x-large"}[
-          this.$vuetify.breakpoint.name
-          ];
-      return size ? {[size]: true} : {};
+      const size = {md: "large", xl: "x-large"}[this.name];
+      return size ? {size} : {};
     }
   },
   methods: {
