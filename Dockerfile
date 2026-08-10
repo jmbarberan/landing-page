@@ -1,11 +1,13 @@
 FROM docker.io/library/node:20-alpine AS build
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
+RUN pnpm build
 
 FROM docker.io/library/nginx:1.27-alpine
 
