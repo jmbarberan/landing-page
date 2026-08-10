@@ -109,7 +109,10 @@ import { useGoTo } from "vuetify";
 export default {
   name: "AppNavigation",
   props: {
-    color: String,
+    color: {
+      type: String,
+      default: "transparent",
+    },
     flat: Boolean,
   },
   setup() {

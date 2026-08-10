@@ -35,5 +35,10 @@ export default [
         afterEach: 'readonly',
       },
     },
+    rules: {
+      // Los specs definen componentes de prueba en linea a proposito, para
+      // ejercitar el helper de montaje sin depender de codigo de produccion.
+      'vue/one-component-per-file': 'off',
+    },
   },
 ]
