@@ -3,7 +3,10 @@ WORKDIR /app
 
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
+# pnpm-workspace.yaml lleva la allowlist allowBuilds. Sin el, pnpm 11 detecta
+# builds bloqueados y sale con codigo 1 (ERR_PNPM_IGNORED_BUILDS), lo que aborta
+# esta capa. Verificado reproduciendo la secuencia fuera de Docker.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
