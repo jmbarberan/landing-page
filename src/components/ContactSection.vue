@@ -22,7 +22,7 @@
               </a>
             </v-col>
             <v-col cols="12" sm="7">
-              <v-form ref="form" v-model="valid" :lazy-validation="lazy">
+              <v-form ref="form" v-model="valid">
                 <v-text-field
                     v-model="name"
                     :rules="nameRules"
@@ -47,7 +47,6 @@
                 <v-btn
                     :disabled="!valid"
                     color="primary"
-                    :dark="valid"
                     rounded
                     block
                     class="mt-3"
@@ -62,21 +61,19 @@
       </v-row>
     </v-container>
     <div class="svg-border-waves text-white">
-      <v-img src="~@/assets/img/borderWavesBlue.svg"/>
+      <v-img src="@/assets/img/borderWavesBlue.svg"/>
     </div>
     <v-snackbar
         v-model="snackbar.enabled"
         timeout="3000"
-        right
-        top
+        location="top right"
         :color="snackbar.color"
     >
       {{ snackbar.text }}
 
-      <template v-slot:action="{ attrs }">
+      <template #actions>
         <v-btn
-            text
-            v-bind="attrs"
+            variant="text"
             @click="snackbar.enabled = false"
         >
           Cerrar
@@ -124,7 +121,6 @@ export default {
       (v) => !!v || "Este campo es necesario",
       (v) => (v && v.length >= 10) || "Mínimo de 10 caracteres",
     ],
-    lazy: false,
     snackbar: {
       enabled: false,
       text: '',
