@@ -13,9 +13,9 @@
               </h1>
               <v-btn
                 rounded
-                outlined
-                large
-                dark
+                variant="outlined"
+                size="large"
+                theme="dark"
                 @click="goTo('#features')"
                 class="mt-5"
               >
