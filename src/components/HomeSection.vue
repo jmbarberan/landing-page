@@ -309,6 +309,7 @@ export default {
   width: 100%;
   margin-bottom: -2px;
   z-index: -1;
+  object-fit: unset;
 }
 
 .card {

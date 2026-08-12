@@ -26,7 +26,7 @@
                   class="d-flex align-center"
                 >
                   <v-img
-                    src="@/assets/img/icon1.svg"
+                    src="../assets/img/icon1.svg"
                     max-width="60px"
                     class="mr-4"
                   />
@@ -41,7 +41,7 @@
                   class="d-flex align-center"
                 >
                   <v-img
-                    src="@/assets/img/icon2.svg"
+                    src="../assets/img/icon2.png"
                     max-width="60px"
                     class="mr-4"
                   />
@@ -56,7 +56,7 @@
                   class="d-flex align-center"
                 >
                   <v-img
-                    src="@/assets/img/icon3.svg"
+                    src="../assets/img/icon3.svg"
                     max-width="60px"
                     class="mr-4"
                   />

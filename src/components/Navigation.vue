@@ -61,30 +61,35 @@
       <div v-else>
         <v-btn
           variant="text"
+          class="menu-inicio"
           @click="goTo('#hero')"
         >
           <span class="mr-2">{{ $t('menu.home') }}</span>
         </v-btn>
         <v-btn
           variant="text"
+          class="menu-inicio"
           @click="goTo('#features')"
         >
           <span class="mr-2">{{ $t("menu.acerca") }}</span>
         </v-btn>
         <v-btn
           variant="text"
+          class="menu-inicio"
           @click="goTo('#download')"
         >
           <span class="mr-2">{{ $t("menu.demo") }}</span>
         </v-btn>
         <v-btn
           variant="text"
+          class="menu-inicio"
           @click="goTo('#pricing')"
         >
           <span class="mr-2">{{ $t("menu.planes") }}</span>
         </v-btn>
         <v-btn
           variant="text"
+          class="menu-inicio"
           @click="goTo('#contact')"
         >
           <span class="mr-2">{{ $t("menu.contacto") }}</span>
@@ -164,6 +169,10 @@ export default {
 </script>
 
 <style scoped>
+.menu-inicio {
+  color: white;
+}
+
 .v-toolbar {
   transition: 0.6s;
 }
