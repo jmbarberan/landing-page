@@ -1,12 +1,9 @@
-FROM docker.io/library/node:20-alpine AS build
+FROM docker.io/library/node:22-alpine AS build
 WORKDIR /app
 
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@11.2.2 --activate
 
-# pnpm-workspace.yaml lleva la allowlist allowBuilds. Sin el, pnpm 11 detecta
-# builds bloqueados y sale con codigo 1 (ERR_PNPM_IGNORED_BUILDS), lo que aborta
-# esta capa. Verificado reproduciendo la secuencia fuera de Docker.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
